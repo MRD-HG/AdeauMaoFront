@@ -7,6 +7,7 @@ import { Toaster } from './components/ui/toaster';
 // Layout components
 import Layout from './components/layout/Layout';
 import AuthLayout from './components/layout/AuthLayout';
+import PlaceholderPage from './components/layout/PlaceholderPage'; // Import the placeholder
 
 // Page components
 import LoginPage from './pages/auth/LoginPage';
@@ -45,19 +46,10 @@ function App() {
           <div className="min-h-screen bg-background">
             <Routes>
               {/* Public routes */}
-              <Route path="/login" element={
-                <AuthLayout>
-                  <LoginPage />
-                </AuthLayout>
-              } />
+              <Route path="/login" element={<AuthLayout><LoginPage /></AuthLayout>} />
 
               {/* Protected routes */}
-              <Route path="/" element={
-                <ProtectedRoute>
-                  <Layout />
-                </ProtectedRoute>
-              }>
-                {/* Dashboard */}
+              <Route path="/" element={<ProtectedRoute><Layout /></ProtectedRoute>}>
                 <Route index element={<Navigate to="/dashboard" replace />} />
                 <Route path="dashboard" element={<DashboardPage />} />
 
@@ -65,17 +57,21 @@ function App() {
                 <Route path="equipment" element={<EquipmentListPage />} />
                 <Route path="equipment/:id" element={<EquipmentDetailsPage />} />
 
-                {/* Work Orders */}
+                {/* Maintenance */}
                 <Route path="work-orders" element={<WorkOrderListPage />} />
                 <Route path="work-orders/:id" element={<WorkOrderDetailsPage />} />
-
-                {/* Intervention Requests */}
                 <Route path="intervention-requests" element={<InterventionRequestListPage />} />
                 <Route path="intervention-requests/:id" element={<InterventionRequestDetailsPage />} />
+                <Route path="planning" element={<PlaceholderPage title="Calendrier de maintenance" description="Planifiez et visualisez les interventions." cardTitle="Calendrier" cardDescription="Fonctionnalité en cours de développement..." />} />
 
-                {/* Team Management */}
+                {/* Management */}
                 <Route path="employees" element={<EmployeeListPage />} />
                 <Route path="teams" element={<TeamListPage />} />
+                <Route path="budgets" element={<PlaceholderPage title="Budgets de maintenance" description="Suivez les coûts et les budgets." cardTitle="Budgets" cardDescription="Fonctionnalité en cours de développement..." />} />
+
+                {/* Analysis */}
+                <Route path="statistics" element={<PlaceholderPage title="Statistiques" description="Analysez les performances de maintenance." cardTitle="Statistiques et KPIs" cardDescription="Fonctionnalité en cours de développement..." />} />
+                <Route path="reports" element={<PlaceholderPage title="Rapports" description="Générez des rapports d'intervention." cardTitle="Rapports" cardDescription="Fonctionnalité en cours de développement..." />} />
 
                 {/* Profile */}
                 <Route path="profile" element={<ProfilePage />} />
@@ -84,7 +80,6 @@ function App() {
               {/* Catch all route */}
               <Route path="*" element={<Navigate to="/dashboard" replace />} />
             </Routes>
-
             <Toaster />
           </div>
         </Router>

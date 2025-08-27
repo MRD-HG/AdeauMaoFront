@@ -11,40 +11,58 @@ import {
   Settings,
   ChevronLeft,
   ChevronRight,
+  BarChart3,
+  Calendar,
+  Wallet,
+  FileText,
 } from 'lucide-react';
 
-const navigation = [
-  {
-    name: 'Tableau de bord',
-    href: '/dashboard',
-    icon: LayoutDashboard,
-  },
-  {
-    name: 'Équipements',
-    href: '/equipment',
-    icon: Wrench,
-  },
-  {
-    name: 'Ordres de travail',
-    href: '/work-orders',
-    icon: ClipboardList,
-  },
-  {
-    name: 'Demandes d\'intervention',
-    href: '/intervention-requests',
-    icon: AlertTriangle,
-  },
-  {
-    name: 'Employés',
-    href: '/employees',
-    icon: Users,
-  },
-  {
-    name: 'Équipes',
-    href: '/teams',
-    icon: UserCheck,
-  },
+const mainNavigation = [
+  { name: 'Tableau de bord', href: '/dashboard', icon: LayoutDashboard },
+  { name: 'Équipements', href: '/equipment', icon: Wrench },
 ];
+
+const maintenanceNavigation = [
+  { name: 'Ordres de travail', href: '/work-orders', icon: ClipboardList },
+  { name: 'Demandes d\'intervention', href: '/intervention-requests', icon: AlertTriangle },
+  { name: 'Calendrier', href: '/planning', icon: Calendar },
+];
+
+const managementNavigation = [
+  { name: 'Employés', href: '/employees', icon: Users },
+  { name: 'Équipes', href: '/teams', icon: UserCheck },
+  { name: 'Budgets', href: '/budgets', icon: Wallet },
+];
+
+const analysisNavigation = [
+    { name: 'Statistiques', href: '/statistics', icon: BarChart3 },
+    { name: 'Rapports', href: '/reports', icon: FileText },
+];
+
+const NavList = ({ items, isCollapsed, location }) => (
+  <div className="space-y-2">
+    {items.map((item) => {
+      const isActive = location.pathname.startsWith(item.href);
+      return (
+        <NavLink
+          key={item.name}
+          to={item.href}
+          className={cn(
+            'flex items-center px-3 py-2 rounded-lg text-sm font-medium transition-colors',
+            isActive
+              ? 'bg-primary text-primary-foreground'
+              : 'text-gray-700 hover:bg-gray-100',
+            isCollapsed ? 'justify-center' : 'justify-start'
+          )}
+          title={isCollapsed ? item.name : undefined}
+        >
+          <item.icon className={cn('h-5 w-5', !isCollapsed && 'mr-3')} />
+          {!isCollapsed && <span>{item.name}</span>}
+        </NavLink>
+      );
+    })}
+  </div>
+);
 
 const Sidebar = ({ isCollapsed, onToggle }) => {
   const location = useLocation();
@@ -56,7 +74,6 @@ const Sidebar = ({ isCollapsed, onToggle }) => {
         isCollapsed ? 'w-16' : 'w-64'
       )}
     >
-      {/* Header */}
       <div className="flex items-center justify-between p-4 border-b border-gray-200">
         {!isCollapsed && (
           <div className="flex items-center space-x-2">
@@ -70,46 +87,29 @@ const Sidebar = ({ isCollapsed, onToggle }) => {
           onClick={onToggle}
           className="p-1.5 rounded-lg hover:bg-gray-100 transition-colors"
         >
-          {isCollapsed ? (
-            <ChevronRight className="h-4 w-4" />
-          ) : (
-            <ChevronLeft className="h-4 w-4" />
-          )}
+          {isCollapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
         </button>
       </div>
 
-      {/* Navigation */}
-      <nav className="flex-1 p-4 space-y-2">
-        {navigation.map((item) => {
-          const isActive = location.pathname === item.href || 
-            (item.href !== '/dashboard' && location.pathname.startsWith(item.href));
-          
-          return (
-            <NavLink
-              key={item.name}
-              to={item.href}
-              className={cn(
-                'flex items-center px-3 py-2 rounded-lg text-sm font-medium transition-colors',
-                isActive
-                  ? 'bg-primary text-primary-foreground'
-                  : 'text-gray-700 hover:bg-gray-100',
-                isCollapsed ? 'justify-center' : 'justify-start'
-              )}
-              title={isCollapsed ? item.name : undefined}
-            >
-              <item.icon className={cn('h-5 w-5', !isCollapsed && 'mr-3')} />
-              {!isCollapsed && <span>{item.name}</span>}
-            </NavLink>
-          );
-        })}
+      <nav className="flex-1 p-4 space-y-4 overflow-y-auto">
+        <NavList items={mainNavigation} isCollapsed={isCollapsed} location={location} />
+        <div>
+          {!isCollapsed && <h3 className="px-3 text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Maintenance</h3>}
+          <NavList items={maintenanceNavigation} isCollapsed={isCollapsed} location={location} />
+        </div>
+        <div>
+          {!isCollapsed && <h3 className="px-3 text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Gestion</h3>}
+          <NavList items={managementNavigation} isCollapsed={isCollapsed} location={location} />
+        </div>
+        <div>
+          {!isCollapsed && <h3 className="px-3 text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Analyse</h3>}
+          <NavList items={analysisNavigation} isCollapsed={isCollapsed} location={location} />
+        </div>
       </nav>
 
-      {/* Footer */}
       {!isCollapsed && (
         <div className="p-4 border-t border-gray-200">
-          <div className="text-xs text-gray-500 text-center">
-            Version 1.0.0
-          </div>
+          <div className="text-xs text-gray-500 text-center">Version 1.0.0</div>
         </div>
       )}
     </div>
@@ -117,4 +117,3 @@ const Sidebar = ({ isCollapsed, onToggle }) => {
 };
 
 export default Sidebar;
-

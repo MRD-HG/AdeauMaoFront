@@ -93,3 +93,11 @@ export const getErrorMessage = (error) => {
   
   return 'Une erreur inattendue s\'est produite';
 };
+export const getCriticiteColor = (criticite) => {
+  const criticiteColors = {
+    'Haute criticité': 'bg-red-100 text-red-800 border-red-200',
+    'Moyenne criticité': 'bg-yellow-100 text-yellow-800 border-yellow-200',
+    'Faible criticité': 'bg-blue-100 text-blue-800 border-blue-200',
+  };
+  return criticiteColors[criticite] || 'bg-gray-100 text-gray-800 border-gray-200';
+};

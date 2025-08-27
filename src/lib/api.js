@@ -4,6 +4,7 @@ import {
   mockEquipment, 
   mockWorkOrders, 
   mockInterventionRequests,
+  mockTeams,
   createMockApiResponse,
   createMockPagedResponse 
 } from './mockData';
@@ -153,7 +154,6 @@ export const equipmentAPI = {
       
       let filteredEquipment = [...mockEquipment];
       
-      // Apply search filter
       if (params.searchTerm) {
         const searchTerm = params.searchTerm.toLowerCase();
         filteredEquipment = filteredEquipment.filter(eq => 
@@ -163,64 +163,38 @@ export const equipmentAPI = {
           eq.fabricant?.toLowerCase().includes(searchTerm)
         );
       }
-      
-      // Apply type filter
       if (params.typeEquipement) {
-        filteredEquipment = filteredEquipment.filter(eq => 
-          eq.typeEquipement === params.typeEquipement
-        );
+        filteredEquipment = filteredEquipment.filter(eq => eq.typeEquipement === params.typeEquipement);
       }
-      
-      // Apply manufacturer filter
       if (params.fabricant) {
-        filteredEquipment = filteredEquipment.filter(eq => 
-          eq.fabricant === params.fabricant
-        );
+        filteredEquipment = filteredEquipment.filter(eq => eq.fabricant === params.fabricant);
       }
-      
-      // Apply status filter
       if (params.etatOperationnel) {
-        filteredEquipment = filteredEquipment.filter(eq => 
-          eq.etatOperationnel === params.etatOperationnel
-        );
+        filteredEquipment = filteredEquipment.filter(eq => eq.etatOperationnel === params.etatOperationnel);
       }
-      
-      // Apply date filters
       if (params.dateFrom) {
-        filteredEquipment = filteredEquipment.filter(eq => 
-          new Date(eq.dateMiseEnService) >= new Date(params.dateFrom)
-        );
+        filteredEquipment = filteredEquipment.filter(eq => new Date(eq.dateMiseEnService) >= new Date(params.dateFrom));
       }
-      
       if (params.dateTo) {
-        filteredEquipment = filteredEquipment.filter(eq => 
-          new Date(eq.dateMiseEnService) <= new Date(params.dateTo)
-        );
+        filteredEquipment = filteredEquipment.filter(eq => new Date(eq.dateMiseEnService) <= new Date(params.dateTo));
       }
       
-      // Apply sorting
       const sortBy = params.sortBy || 'nom';
       const sortDescending = params.sortDescending || false;
       
       filteredEquipment.sort((a, b) => {
         let aVal = a[sortBy] || '';
         let bVal = b[sortBy] || '';
-        
         if (typeof aVal === 'string') {
           aVal = aVal.toLowerCase();
           bVal = bVal.toLowerCase();
         }
-        
         if (aVal < bVal) return sortDescending ? 1 : -1;
         if (aVal > bVal) return sortDescending ? -1 : 1;
         return 0;
       });
       
-      return createMockPagedResponse(
-        filteredEquipment, 
-        params.pageNumber || 1, 
-        params.pageSize || 10
-      );
+      return createMockPagedResponse(filteredEquipment, params.pageNumber || 1, params.pageSize || 10);
     }
     return apiClient.get('/equipements', { params });
   },
@@ -249,13 +223,7 @@ export const equipmentAPI = {
   create: async (data) => {
     if (DEMO_MODE) {
       await mockDelay(800);
-      const newEquipment = {
-        ...data,
-        id: Math.max(...mockEquipment.map(eq => eq.id)) + 1,
-        dateCreation: new Date().toISOString(),
-        dateModification: new Date().toISOString(),
-        organes: []
-      };
+      const newEquipment = { ...data, id: Math.max(...mockEquipment.map(eq => eq.id)) + 1, dateCreation: new Date().toISOString(), dateModification: new Date().toISOString(), organes: [] };
       mockEquipment.push(newEquipment);
       return createMockApiResponse(newEquipment);
     }
@@ -265,14 +233,8 @@ export const equipmentAPI = {
     if (DEMO_MODE) {
       await mockDelay(600);
       const index = mockEquipment.findIndex(eq => eq.id === parseInt(id));
-      if (index === -1) {
-        throw new Error('Équipement non trouvé');
-      }
-      mockEquipment[index] = {
-        ...mockEquipment[index],
-        ...data,
-        dateModification: new Date().toISOString()
-      };
+      if (index === -1) throw new Error('Équipement non trouvé');
+      mockEquipment[index] = { ...mockEquipment[index], ...data, dateModification: new Date().toISOString() };
       return createMockApiResponse(mockEquipment[index]);
     }
     return apiClient.put(`/equipements/${id}`, data);
@@ -281,9 +243,7 @@ export const equipmentAPI = {
     if (DEMO_MODE) {
       await mockDelay(400);
       const index = mockEquipment.findIndex(eq => eq.id === parseInt(id));
-      if (index === -1) {
-        throw new Error('Équipement non trouvé');
-      }
+      if (index === -1) throw new Error('Équipement non trouvé');
       mockEquipment.splice(index, 1);
       return createMockApiResponse(null);
     }
@@ -295,9 +255,7 @@ export const equipmentAPI = {
     if (DEMO_MODE) {
       await mockDelay();
       const equipment = mockEquipment.find(eq => eq.id === parseInt(equipmentId));
-      if (!equipment) {
-        throw new Error('Équipement non trouvé');
-      }
+      if (!equipment) throw new Error('Équipement non trouvé');
       return createMockApiResponse(equipment.organes || []);
     }
     return apiClient.get(`/equipements/${equipmentId}/organes`);
@@ -306,14 +264,8 @@ export const equipmentAPI = {
     if (DEMO_MODE) {
       await mockDelay(600);
       const equipment = mockEquipment.find(eq => eq.id === parseInt(data.equipementId));
-      if (!equipment) {
-        throw new Error('Équipement non trouvé');
-      }
-      const newOrgane = {
-        ...data,
-        id: Date.now(), // Simple ID generation for demo
-        dateCreation: new Date().toISOString()
-      };
+      if (!equipment) throw new Error('Équipement non trouvé');
+      const newOrgane = { ...data, id: Date.now(), dateCreation: new Date().toISOString() };
       equipment.organes = equipment.organes || [];
       equipment.organes.push(newOrgane);
       return createMockApiResponse(newOrgane);
@@ -370,11 +322,45 @@ export const employeeAPI = {
 };
 
 export const teamAPI = {
-  getAll: (params) => apiClient.get('/equipes', { params }),
+  getAll: async (params = {}) => {
+    if (DEMO_MODE) {
+      await mockDelay();
+      const filtered = mockTeams.filter(team => 
+        team.nom.toLowerCase().includes((params.searchTerm || '').toLowerCase()) ||
+        team.reference.toLowerCase().includes((params.searchTerm || '').toLowerCase())
+      );
+      return createMockPagedResponse(filtered, params.pageNumber, params.pageSize);
+    }
+    return apiClient.get('/equipes', { params });
+  },
   getById: (id) => apiClient.get(`/equipes/${id}`),
-  create: (data) => apiClient.post('/equipes', data),
-  update: (id, data) => apiClient.put(`/equipes/${id}`, data),
-  delete: (id) => apiClient.delete(`/equipes/${id}`),
+  create: async (data) => {
+    if (DEMO_MODE) {
+      await mockDelay();
+      const newTeam = { ...data, id: Date.now() };
+      mockTeams.push(newTeam);
+      return createMockApiResponse(newTeam);
+    }
+    return apiClient.post('/equipes', data);
+  },
+  update: async (id, data) => {
+    if (DEMO_MODE) {
+      await mockDelay();
+      const index = mockTeams.findIndex(t => t.id === id);
+      if (index > -1) mockTeams[index] = { ...mockTeams[index], ...data };
+      return createMockApiResponse(mockTeams[index]);
+    }
+    return apiClient.put(`/equipes/${id}`, data);
+  },
+  delete: async (id) => {
+    if (DEMO_MODE) {
+      await mockDelay();
+      const index = mockTeams.findIndex(t => t.id === id);
+      if (index > -1) mockTeams.splice(index, 1);
+      return createMockApiResponse(null);
+    }
+    return apiClient.delete(`/equipes/${id}`);
+  },
 };
 
 export const competenceAPI = {
@@ -386,4 +372,3 @@ export const competenceAPI = {
 };
 
 export default apiClient;
-

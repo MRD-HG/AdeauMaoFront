@@ -2,7 +2,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { equipmentAPI } from '../lib/api';
 import { toast } from 'sonner';
 
-// Query keys
+// Query keys for managing cache invalidation and dependencies
 export const equipmentKeys = {
   all: ['equipment'],
   lists: () => [...equipmentKeys.all, 'list'],
@@ -12,27 +12,27 @@ export const equipmentKeys = {
   organes: (equipmentId) => [...equipmentKeys.all, 'organes', equipmentId],
 };
 
-// Get equipment list with filters
+// Hook to get a single equipment by its ID
+export const useEquipmentById = (id) => {
+  return useQuery({
+    queryKey: equipmentKeys.detail(id),
+    queryFn: () => equipmentAPI.getById(id),
+    enabled: !!id, // Only run the query if the id is provided
+    select: (data) => data.data.data, // Select the nested data from the API response
+  });
+};
+
+// Hook to get a paginated and filtered list of equipment
 export const useEquipmentList = (filters = {}) => {
   return useQuery({
     queryKey: equipmentKeys.list(filters),
     queryFn: () => equipmentAPI.getAll(filters),
-    select: (data) => data.data,
-    staleTime: 5 * 60 * 1000, // 5 minutes
+    select: (data) => data.data, // The list endpoint returns data at a different level
+    staleTime: 5 * 60 * 1000, // Cache data for 5 minutes
   });
 };
 
-// Get single equipment by ID
-export const useEquipment = (id) => {
-  return useQuery({
-    queryKey: equipmentKeys.detail(id),
-    queryFn: () => equipmentAPI.getById(id),
-    select: (data) => data.data.data,
-    enabled: !!id,
-  });
-};
-
-// Get equipment by reference
+// Hook to get a single equipment by its reference string
 export const useEquipmentByReference = (reference) => {
   return useQuery({
     queryKey: [...equipmentKeys.all, 'reference', reference],
@@ -42,7 +42,7 @@ export const useEquipmentByReference = (reference) => {
   });
 };
 
-// Get equipment organes
+// Hook to get the list of organes for a specific equipment
 export const useEquipmentOrganes = (equipmentId) => {
   return useQuery({
     queryKey: equipmentKeys.organes(equipmentId),
@@ -51,14 +51,23 @@ export const useEquipmentOrganes = (equipmentId) => {
     enabled: !!equipmentId,
   });
 };
+export const useEquipment = (id) => {
+  return useQuery({
+    queryKey: ['equipment', id], // A simplified key for a single item
+    queryFn: () => equipmentAPI.getById(id),
+    select: (data) => data.data.data, // Selects the nested data object
+    enabled: !!id, // The query will not run until the id is available
+  });
+};
 
-// Create equipment mutation
+// Hook for the mutation to create a new equipment
 export const useCreateEquipment = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: equipmentAPI.create,
+    mutationFn: equipmentAPI.create, // Correctly uses the method from the imported object
     onSuccess: (data) => {
+      // When creation is successful, invalidate all list queries to refetch
       queryClient.invalidateQueries({ queryKey: equipmentKeys.lists() });
       toast.success('Équipement créé avec succès');
       return data.data.data;
@@ -70,13 +79,14 @@ export const useCreateEquipment = () => {
   });
 };
 
-// Update equipment mutation
+// Hook for the mutation to update an existing equipment
 export const useUpdateEquipment = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: ({ id, data }) => equipmentAPI.update(id, data),
     onSuccess: (data, variables) => {
+      // Invalidate both the list and the specific detail query for this item
       queryClient.invalidateQueries({ queryKey: equipmentKeys.lists() });
       queryClient.invalidateQueries({ queryKey: equipmentKeys.detail(variables.id) });
       toast.success('Équipement mis à jour avec succès');
@@ -89,7 +99,7 @@ export const useUpdateEquipment = () => {
   });
 };
 
-// Delete equipment mutation
+// Hook for the mutation to delete an equipment
 export const useDeleteEquipment = () => {
   const queryClient = useQueryClient();
 
@@ -106,43 +116,43 @@ export const useDeleteEquipment = () => {
   });
 };
 
-// Create organe mutation
+// Hook for the mutation to create a new organe
 export const useCreateOrgane = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: equipmentAPI.createOrgane,
     onSuccess: (data, variables) => {
-      queryClient.invalidateQueries({ 
-        queryKey: equipmentKeys.organes(variables.equipementId) 
+      // Invalidate the organes list for the parent equipment
+      queryClient.invalidateQueries({
+        queryKey: equipmentKeys.organes(variables.equipementId)
       });
       toast.success('Organe créé avec succès');
       return data.data.data;
     },
     onError: (error) => {
-      const message = error.response?.data?.message || 'Erreur lors de la création de l\'organe';
+      const message = error.response?.data?.message || "Erreur lors de la création de l'organe";
       toast.error(message);
     },
   });
 };
 
-// Delete organe mutation
+// Hook for the mutation to delete an organe
 export const useDeleteOrgane = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: equipmentAPI.deleteOrgane,
-    onSuccess: (_, organeId) => {
-      // Invalidate all organes queries since we don't know which equipment this organe belongs to
-      queryClient.invalidateQueries({ 
-        queryKey: [...equipmentKeys.all, 'organes'] 
+    onSuccess: () => {
+      // Invalidate all queries related to organes as we might not know the parent equipment
+      queryClient.invalidateQueries({
+        queryKey: [...equipmentKeys.all, 'organes']
       });
       toast.success('Organe supprimé avec succès');
     },
     onError: (error) => {
-      const message = error.response?.data?.message || 'Erreur lors de la suppression de l\'organe';
+      const message = error.response?.data?.message || "Erreur lors de la suppression de l'organe";
       toast.error(message);
     },
   });
 };
-

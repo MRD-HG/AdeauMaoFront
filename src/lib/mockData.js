@@ -165,7 +165,11 @@ export const mockEquipment = [
     organes: []
   }
 ];
-
+export const mockTeams = [
+  { id: 1, reference: 'ELEC', nom: 'Électriciens' },
+  { id: 2, reference: 'MEC', nom: 'Mécaniciens' },
+  
+];
 export const mockWorkOrders = [
   {
     id: 1,
