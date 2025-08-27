@@ -12,6 +12,9 @@ import {
   mockBreakdownCauses ,
   createMockApiResponse,
   createMockPagedResponse ,
+  mockTriggers ,
+  mockSubcontractors ,
+  mockWorkflows 
 
 } from './mockData';
 
@@ -48,6 +51,79 @@ export const setAuthTokens = (token, refresh) => {
     localStorage.removeItem('authToken');
     localStorage.removeItem('refreshToken');
   }
+};
+export const workflowAPI = {
+
+  getAll: async (params = {}) => {
+
+    if (DEMO_MODE) {
+
+      await mockDelay();
+
+      return createMockPagedResponse(mockWorkflows, params.pageNumber, params.pageSize);
+
+    }
+
+    return apiClient.get('/workflows', { params });
+
+  },
+
+  create: async (data) => {
+
+    if (DEMO_MODE) {
+
+        await mockDelay();
+
+        const newWorkflow = { ...data, id: Date.now(), statut: 'Actif' };
+
+        mockWorkflows.push(newWorkflow);
+
+        return createMockApiResponse(newWorkflow);
+
+    }
+
+    return apiClient.post('/workflows', data);
+
+  },
+
+};
+export const subcontractorAPI = {
+  getAll: async (params = {}) => {
+    if (DEMO_MODE) {
+      await mockDelay();
+      return createMockPagedResponse(mockSubcontractors, params.pageNumber, params.pageSize);
+    }
+    return apiClient.get('/subcontractors', { params });
+  },
+  create: async (data) => {
+    if (DEMO_MODE) {
+        await mockDelay();
+        const newSubcontractor = { ...data, id: Date.now() };
+        mockSubcontractors.push(newSubcontractor);
+        return createMockApiResponse(newSubcontractor);
+    }
+    return apiClient.post('/subcontractors', data);
+  },
+};
+
+
+export const triggerAPI = {
+  getAll: async (params = {}) => {
+    if (DEMO_MODE) {
+      await mockDelay();
+      return createMockPagedResponse(mockTriggers, params.pageNumber, params.pageSize);
+    }
+    return apiClient.get('/triggers', { params });
+  },
+  create: async (data) => {
+    if (DEMO_MODE) {
+        await mockDelay();
+        const newTrigger = { ...data, id: Date.now() };
+        mockTriggers.push(newTrigger);
+        return createMockApiResponse(newTrigger);
+    }
+    return apiClient.post('/triggers', data);
+  },
 };
 export const workCenterAPI = {
   getAll: async (params = {}) => {

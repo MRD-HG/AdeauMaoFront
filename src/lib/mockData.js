@@ -191,6 +191,11 @@ export const mockEquipment = [
     organes: []
   }
 ];
+export const mockWorkCenters = [
+  { id: 1, designation: '40 semaines' },
+  { id: 2, designation: '24/24' },
+  { id: 3, designation: '6 sur 7' },
+];
 export const mockBreakdownCauses = [
   { id: 1, reference: 'PE', libelle: 'Panne électrique' },
   { id: 2, reference: 'PM', libelle: 'Panne mécanique' },
@@ -205,7 +210,18 @@ export const mockTeams = [
   { id: 1, reference: 'ELEC', nom: 'Électriciens' },
   { id: 2, reference: 'MEC', nom: 'Mécaniciens' },
   
-];export const mockWorkOrders = [
+];
+export const mockTriggers = [
+  { id: 1, reference: 'D1', nom: 'Entretien 3000 heures', unite: 'H', valeur: 3000 },
+  { id: 2, reference: 'D2', nom: 'Entretien 4000 heures', unite: 'H', valeur: 4000 },
+  { id: 3, reference: 'AH', nom: 'Analyse des huiles Transfo', unite: 'A', valeur: 1 },
+];
+export const mockSubcontractors = [
+  { id: 1, reference: 'TEH', nom: 'Travaux Électrique HAKAM', telephone: '+212661123456', email: 'direction@hakam.com', pays: 'Maroc', ville: 'Salé', adresse: 'Hay Salam' },
+  { id: 2, reference: 'AF', nom: 'Sté Air Froid', telephone: '+212662234567', email: 'y.chater@airfroid.com', pays: 'Maroc', ville: 'Casablanca', adresse: '196 Avenue...'},
+  { id: 3, reference: 'OL', nom: 'Sté Oksa-labo', telephone: '+212663345678', email: 'mohammed.jeddour@oksa.co', pays: 'Maroc', ville: 'Salé', adresse: 'N°59 Zone...'},
+];
+export const mockWorkOrders = [
   {
     id: 1,
     numeroOT: "OT-2024-001",

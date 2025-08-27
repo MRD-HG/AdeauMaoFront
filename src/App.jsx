@@ -27,7 +27,13 @@ import ReportsPage from './pages/reports/ReportsPage';
 import BudgetsPage from './pages/budgets/BudgetsPage';
 import CategoriesPage from './pages/settings/CategoriesPage';
 import BreakdownCausesPage from './pages/settings/BreakdownCausesPage';
-import MaintenancePlansPage from './pages/maintenance-plans/MaintenancePlansPage'
+import MaintenancePlansPage from './pages/maintenance-plans/MaintenancePlansPage';
+import TriggersPage from './pages/settings/TriggersPage';
+import SubcontractorsPage from './pages/settings/SubcontractorsPage';
+import WorkflowsPage from './pages/settings/WorkflowsPage';
+
+
+
 // Protected Route component
 import ProtectedRoute from './components/auth/ProtectedRoute';
 import WorkCentersPage from './pages/settings/WorkCentersPage';
@@ -81,6 +87,9 @@ function App() {
                 <Route path="settings/categories" element={<CategoriesPage />} />
                 <Route path="settings/breakdown-causes" element={<BreakdownCausesPage />} />
                 <Route path="settings/work-centers" element={<WorkCentersPage />} />
+                <Route path="settings/triggers" element={<TriggersPage />} />
+                <Route path="settings/subcontractors" element={<SubcontractorsPage />} />
+                <Route path="settings/workflows" element={<WorkflowsPage />} />
                 {/* Profile */}
                 <Route path="profile" element={<ProfilePage />} />
               </Route>
