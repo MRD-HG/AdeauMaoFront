@@ -115,44 +115,35 @@ export const useDeleteEquipment = () => {
     },
   });
 };
-
-// Hook for the mutation to create a new organe
-export const useCreateOrgane = () => {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: equipmentAPI.createOrgane,
-    onSuccess: (data, variables) => {
-      // Invalidate the organes list for the parent equipment
-      queryClient.invalidateQueries({
-        queryKey: equipmentKeys.organes(variables.equipementId)
-      });
-      toast.success('Organe créé avec succès');
-      return data.data.data;
-    },
-    onError: (error) => {
-      const message = error.response?.data?.message || "Erreur lors de la création de l'organe";
-      toast.error(message);
-    },
+export const useOrganes = (equipmentId) => {
+  return useQuery({
+    queryKey: ['organes', equipmentId],
+    queryFn: () => equipmentAPI.getOrganes(equipmentId),
+    select: (data) => data.data.data,
+    enabled: !!equipmentId,
   });
 };
 
-// Hook for the mutation to delete an organe
-export const useDeleteOrgane = () => {
+export const useCreateOrgane = () => {
   const queryClient = useQueryClient();
-
   return useMutation({
-    mutationFn: equipmentAPI.deleteOrgane,
-    onSuccess: () => {
-      // Invalidate all queries related to organes as we might not know the parent equipment
-      queryClient.invalidateQueries({
-        queryKey: [...equipmentKeys.all, 'organes']
-      });
-      toast.success('Organe supprimé avec succès');
+    mutationFn: ({ equipmentId, data }) => equipmentAPI.createOrgane(equipmentId, data),
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: ['organes', variables.equipmentId] });
+      toast.success("Organe ajouté avec succès.");
     },
-    onError: (error) => {
-      const message = error.response?.data?.message || "Erreur lors de la suppression de l'organe";
-      toast.error(message);
-    },
+    onError: (err) => toast.error(err.message || "Erreur lors de l'ajout de l'organe."),
   });
+};
+
+export const useDeleteOrgane = () => {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: (organeId) => equipmentAPI.deleteOrgane(organeId),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['organes'] }); // Invalide toutes les listes d'organes
+            toast.success("Organe supprimé avec succès.");
+        },
+        onError: (err) => toast.error(err.message || "Erreur lors de la suppression."),
+    });
 };
