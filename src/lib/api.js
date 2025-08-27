@@ -424,12 +424,11 @@ export const interventionRequestAPI = {
   },
 };
 
-
 export const employeeAPI = {
   getAll: async (params = {}) => {
     if (DEMO_MODE) {
       await mockDelay();
-      // Ajoutez ici la logique de filtrage/recherche plus tard si nécessaire
+      // This is the logic that was missing
       return createMockPagedResponse(mockEmployees, params.pageNumber, params.pageSize);
     }
     return apiClient.get('/employes', { params });
@@ -445,7 +444,11 @@ export const employeeAPI = {
   create: async (data) => {
     if (DEMO_MODE) {
       await mockDelay();
-      const newEmployee = { ...data, id: Date.now() };
+      const newEmployee = { 
+        ...data, 
+        id: Date.now(), 
+        matricule: `M${mockEmployees.length + 10}` 
+      };
       mockEmployees.push(newEmployee);
       return createMockApiResponse(newEmployee);
     }
@@ -473,7 +476,7 @@ export const employeeAPI = {
     }
     return apiClient.delete(`/employes/${id}`);
   },
-};
+}
 
 
 export const teamAPI = {

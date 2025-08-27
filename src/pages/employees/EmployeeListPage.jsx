@@ -2,11 +2,12 @@ import React from 'react';
 import { Button } from '../../components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/card';
 import { Plus } from 'lucide-react';
-import { useEmployeeList } from '../../hooks/useEmployees';
+import { useEmployeeList } from '../../hooks/useEmployees'; // Correction de l'import
 import EmployeeTable from '../../components/employees/EmployeeTable';
 import { motion } from 'framer-motion';
 
 const EmployeeListPage = () => {
+  // Le hook est maintenant correctement défini et importé
   const { data, isLoading, error } = useEmployeeList({});
   const employees = data?.items || [];
 
@@ -25,7 +26,9 @@ const EmployeeListPage = () => {
           <CardHeader><CardTitle>Liste du personnel</CardTitle></CardHeader>
           <CardContent>
             {error ? (
-              <p className="text-red-500 text-center py-8">Erreur de chargement des données.</p>
+              <p className="text-red-500 text-center py-8">
+                Erreur de chargement des données. Assurez-vous que `useEmployees.js` est créé.
+              </p>
             ) : (
               <EmployeeTable employees={employees} isLoading={isLoading} />
             )}

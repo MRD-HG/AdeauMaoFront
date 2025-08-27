@@ -132,10 +132,10 @@ const MaintenanceChart = ({ type = 'bar', title, description }) => {
               <YAxis 
                 stroke="#64748b"
                 fontSize={12}
-                tickFormatter={(value) => `${value / 1000}k€`}
+                tickFormatter={(value) => `${value / 1000}k DH`}
               />
               <Tooltip 
-                formatter={(value) => [`${value.toLocaleString()}€`, 'Coût']}
+                formatter={(value) => [`${value.toLocaleString()}DH`, 'Coût']}
                 labelFormatter={(label) => `Mois: ${label}`}
               />
               <Area 
