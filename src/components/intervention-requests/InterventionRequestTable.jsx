@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom'; // Add this import
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../ui/table';
 import { Badge } from '../ui/badge';
 import { formatDate, truncateText } from '../../lib/utils';
@@ -47,7 +48,9 @@ const InterventionRequestTable = ({ requests, isLoading }) => {
           <TableBody>
             {requests.map((req) => (
               <TableRow key={req.id}>
-                <TableCell className="font-mono">DI-{req.id}</TableCell>
+                <TableCell className="font-mono text-primary hover:underline">
+                    <Link to={`/intervention-requests/${req.id}`}>DI-{req.id}</Link>
+                </TableCell>
                 <TableCell><Badge variant="outline" className={getPriorityBadgeClass(req.priorite)}>{req.priorite}</Badge></TableCell>
                 <TableCell className="font-medium">{req.equipementNom}</TableCell>
                 <TableCell>{truncateText(req.descriptionProbleme, 50)}</TableCell>
@@ -60,7 +63,9 @@ const InterventionRequestTable = ({ requests, isLoading }) => {
                             <Button variant="ghost" className="h-8 w-8 p-0"><MoreHorizontal className="h-4 w-4" /></Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent>
-                            <DropdownMenuItem>Voir les détails</DropdownMenuItem>
+                            <DropdownMenuItem asChild>
+                                <Link to={`/intervention-requests/${req.id}`}>Voir les détails</Link>
+                            </DropdownMenuItem>
                             <DropdownMenuItem>Créer un OT</DropdownMenuItem>
                         </DropdownMenuContent>
                     </DropdownMenu>

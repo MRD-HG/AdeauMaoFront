@@ -324,6 +324,44 @@ export const mockInterventionRequests = [
     commentaires: null
   }
 ];
+export const mockEmployees = [
+  {
+    id: 1,
+    matricule: 'M001',
+    nom: 'Alami',
+    prenom: 'Ahmed',
+    poste: 'Électricien',
+    equipeId: 1,
+    equipeNom: 'Électriciens'
+  },
+  {
+    id: 2,
+    matricule: 'M002',
+    nom: 'Bennani',
+    prenom: 'Hassan',
+    poste: 'Mécanicien',
+    equipeId: 2,
+    equipeNom: 'Mécaniciens'
+  },
+  {
+    id: 3,
+    matricule: 'M003',
+    nom: 'Zahra',
+    prenom: 'Fatima',
+    poste: 'Chaudronnier',
+    equipeId: 3,
+    equipeNom: 'Chaudronniers'
+  },
+   {
+    id: 4,
+    matricule: 'M004',
+    nom: 'Alaoui',
+    prenom: 'Youssef',
+    poste: 'Technicien de maintenance',
+    equipeId: 2,
+    equipeNom: 'Mécaniciens'
+  }
+];
 
 // Mock API responses
 export const createMockApiResponse = (data, success = true, message = "Opération réussie") => ({

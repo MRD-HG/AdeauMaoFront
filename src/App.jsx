@@ -21,6 +21,7 @@ import InterventionRequestDetailsPage from './pages/intervention-requests/Interv
 import EmployeeListPage from './pages/employees/EmployeeListPage';
 import TeamListPage from './pages/teams/TeamListPage';
 import ProfilePage from './pages/ProfilePage';
+import PlanningPage from './pages/planning/PlanningPage';
 
 // Protected Route component
 import ProtectedRoute from './components/auth/ProtectedRoute';
@@ -62,7 +63,7 @@ function App() {
                 <Route path="work-orders/:id" element={<WorkOrderDetailsPage />} />
                 <Route path="intervention-requests" element={<InterventionRequestListPage />} />
                 <Route path="intervention-requests/:id" element={<InterventionRequestDetailsPage />} />
-                <Route path="planning" element={<PlaceholderPage title="Calendrier de maintenance" description="Planifiez et visualisez les interventions." cardTitle="Calendrier" cardDescription="Fonctionnalité en cours de développement..." />} />
+                <Route path="planning" element={<PlanningPage />} />
 
                 {/* Management */}
                 <Route path="employees" element={<EmployeeListPage />} />

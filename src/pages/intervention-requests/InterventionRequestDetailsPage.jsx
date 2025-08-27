@@ -1,10 +1,12 @@
 import React from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-// We need a hook to get a single request by ID
-// import { useInterventionRequest } from '../../hooks/useInterventionRequests';
+import { useInterventionRequest } from '../../hooks/useInterventionRequests';
 import { Button } from '../../components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/card';
 import { ArrowLeft, Wrench } from 'lucide-react';
+import { Skeleton } from '../../components/ui/skeleton';
+import { formatDate } from '../../lib/utils';
+import { Badge } from '../../components/ui/badge';
 
 const DetailItem = ({ label, value }) => (
     <div>
@@ -16,21 +18,15 @@ const DetailItem = ({ label, value }) => (
 const InterventionRequestDetailsPage = () => {
     const { id } = useParams();
     const navigate = useNavigate();
-    // const { data: request, isLoading, error } = useInterventionRequest(id);
+    const { data: request, isLoading, error } = useInterventionRequest(id);
 
-    // Using a placeholder until the hook is ready
-    const isLoading = false;
-    const request = {
-        id: id,
-        equipementNom: "Pompe Centrifuge Grundfos",
-        demandeurNom: "Youssef Alaoui",
-        priorite: "Haute",
-        statut: "EnCours",
-        dateCreation: "2024-01-24T10:30:00Z",
-        descriptionProbleme: "Fuite importante au niveau du joint d'étanchéité, perte de pression"
-    };
+    if (isLoading) {
+        return <Skeleton className="h-[300px] w-full" />;
+    }
 
-    if (isLoading) return <div>Chargement...</div>;
+    if (error || !request) {
+        return <p className="text-red-500 text-center py-8">Impossible de charger la demande d'intervention.</p>;
+    }
 
     return (
         <div className="space-y-6">
@@ -51,14 +47,25 @@ const InterventionRequestDetailsPage = () => {
                 <CardHeader>
                     <CardTitle>Informations</CardTitle>
                 </CardHeader>
-                <CardContent className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-                    <DetailItem label="Demandeur" value={request.demandeurNom} />
-                    <DetailItem label="Priorité" value={request.priorite} />
-                    <DetailItem label="Statut" value={request.statut} />
-                    <DetailItem label="Date de création" value={new Date(request.dateCreation).toLocaleDateString()} />
-                    <div className="md:col-span-2 lg:col-span-4">
+                <CardContent className="space-y-4">
+                    <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+                        <DetailItem label="Demandeur" value={request.demandeurNom} />
+                        <DetailItem label="Priorité">
+                           <Badge>{request.priorite}</Badge>
+                        </DetailItem>
+                        <DetailItem label="Statut">
+                            <Badge variant="secondary">{request.statut}</Badge>
+                        </DetailItem>
+                        <DetailItem label="Date de création" value={formatDate(request.dateCreation)} />
+                    </div>
+                    <div className="pt-4 border-t">
                          <DetailItem label="Description du problème" value={request.descriptionProbleme} />
                     </div>
+                     {request.commentaires && (
+                        <div className="pt-4 border-t">
+                            <DetailItem label="Commentaires" value={request.commentaires} />
+                        </div>
+                     )}
                 </CardContent>
             </Card>
         </div>

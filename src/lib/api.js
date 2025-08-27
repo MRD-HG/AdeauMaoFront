@@ -290,6 +290,7 @@ export const equipmentAPI = {
   },
 };
 
+
 export const workOrderAPI = {
   getAll: async (params = {}) => {
     if (DEMO_MODE) {
@@ -422,15 +423,58 @@ export const interventionRequestAPI = {
     return apiClient.delete(`/demandesintervention/${id}`);
   },
 };
+
+
 export const employeeAPI = {
-  getAll: (params) => apiClient.get('/employes', { params }),
-  getById: (id) => apiClient.get(`/employes/${id}`),
-  create: (data) => apiClient.post('/employes', data),
-  update: (id, data) => apiClient.put(`/employes/${id}`, data),
-  delete: (id) => apiClient.delete(`/employes/${id}`),
-  assignToTeam: (data) => apiClient.post('/employes/assign-equipe', data),
-  assignCompetence: (data) => apiClient.post('/employes/assign-competence', data),
+  getAll: async (params = {}) => {
+    if (DEMO_MODE) {
+      await mockDelay();
+      // Ajoutez ici la logique de filtrage/recherche plus tard si nécessaire
+      return createMockPagedResponse(mockEmployees, params.pageNumber, params.pageSize);
+    }
+    return apiClient.get('/employes', { params });
+  },
+  getById: async (id) => {
+    if (DEMO_MODE) {
+      await mockDelay();
+      const employee = mockEmployees.find(e => e.id === parseInt(id));
+      return createMockApiResponse(employee);
+    }
+    return apiClient.get(`/employes/${id}`);
+  },
+  create: async (data) => {
+    if (DEMO_MODE) {
+      await mockDelay();
+      const newEmployee = { ...data, id: Date.now() };
+      mockEmployees.push(newEmployee);
+      return createMockApiResponse(newEmployee);
+    }
+    return apiClient.post('/employes', data);
+  },
+  update: async (id, data) => {
+    if (DEMO_MODE) {
+        await mockDelay();
+        const index = mockEmployees.findIndex(e => e.id === parseInt(id));
+        if (index > -1) {
+            mockEmployees[index] = { ...mockEmployees[index], ...data };
+        }
+        return createMockApiResponse(mockEmployees[index]);
+    }
+    return apiClient.put(`/employes/${id}`, data);
+  },
+  delete: async (id) => {
+    if (DEMO_MODE) {
+        await mockDelay();
+        const index = mockEmployees.findIndex(e => e.id === parseInt(id));
+        if (index > -1) {
+            mockEmployees.splice(index, 1);
+        }
+        return createMockApiResponse(null);
+    }
+    return apiClient.delete(`/employes/${id}`);
+  },
 };
+
 
 export const teamAPI = {
   getAll: async (params = {}) => {

@@ -2,20 +2,19 @@ import React, { useState } from 'react';
 import { Button } from '../../components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/card';
 import { Plus } from 'lucide-react';
-import { useInterventionRequestList } from '../../hooks/useInterventionRequests';
+import { useInterventionRequestList, useCreateInterventionRequest } from '../../hooks/useInterventionRequests';
 import InterventionRequestTable from '../../components/intervention-requests/InterventionRequestTable';
 import { motion } from 'framer-motion';
 import { Tabs, TabsList, TabsTrigger } from '../../components/ui/tabs';
 import { Dialog, DialogTrigger } from '../../components/ui/dialog';
 import InterventionRequestForm from '../../components/intervention-requests/InterventionRequestForm';
-// We'll need a create hook, let's add it to the hooks file next
-// import { useCreateInterventionRequest } from '../../hooks/useInterventionRequests';
+import { mockEquipment } from '../../lib/mockData';
 
 const InterventionRequestListPage = () => {
   const [statusFilter, setStatusFilter] = useState('Tous');
   const [dialogOpen, setDialogOpen] = useState(false);
 
-  // const createRequestMutation = useCreateInterventionRequest();
+  const createRequestMutation = useCreateInterventionRequest();
   
   const { data, isLoading, error } = useInterventionRequestList({
       statut: statusFilter === 'Tous' ? null : statusFilter
@@ -24,12 +23,17 @@ const InterventionRequestListPage = () => {
   const requests = data?.items || [];
 
   const handleFormSubmit = (formData) => {
-    console.log("New Intervention Request:", formData);
-    // createRequestMutation.mutate(formData, {
-    //   onSuccess: () => setDialogOpen(false)
-    // });
-    alert("La fonctionnalité de création sera bientôt connectée à l'API.");
-    setDialogOpen(false);
+    const selectedEquipment = mockEquipment.find(eq => eq.id === formData.equipementId);
+    const fullData = {
+      ...formData,
+      equipementNom: selectedEquipment?.nom,
+      equipementReference: selectedEquipment?.reference,
+      demandeurNom: "Utilisateur Actuel" // In a real app, get this from context
+    };
+    
+    createRequestMutation.mutate(fullData, {
+      onSuccess: () => setDialogOpen(false)
+    });
   };
 
   return (
@@ -66,7 +70,7 @@ const InterventionRequestListPage = () => {
       </div>
       <InterventionRequestForm 
         onSubmit={handleFormSubmit}
-        // isLoading={createRequestMutation.isPending}
+        isLoading={createRequestMutation.isPending}
       />
     </Dialog>
   );
