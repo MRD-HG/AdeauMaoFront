@@ -25,10 +25,12 @@ import PlanningPage from './pages/planning/PlanningPage';
 import StatisticsPage from './pages/statistics/StatisticsPage';
 import ReportsPage from './pages/reports/ReportsPage';
 import BudgetsPage from './pages/budgets/BudgetsPage';
+import CategoriesPage from './pages/settings/CategoriesPage';
+import BreakdownCausesPage from './pages/settings/BreakdownCausesPage';
 import MaintenancePlansPage from './pages/maintenance-plans/MaintenancePlansPage'
 // Protected Route component
 import ProtectedRoute from './components/auth/ProtectedRoute';
-
+import WorkCentersPage from './pages/settings/WorkCentersPage';
 import './App.css';
 
 // Create a client for React Query
@@ -76,8 +78,9 @@ function App() {
                 {/* Analysis */}
                <Route path="statistics" element={<StatisticsPage />} />
                <Route path="reports" element={<ReportsPage />} />
-
-
+                <Route path="settings/categories" element={<CategoriesPage />} />
+                <Route path="settings/breakdown-causes" element={<BreakdownCausesPage />} />
+                <Route path="settings/work-centers" element={<WorkCentersPage />} />
                 {/* Profile */}
                 <Route path="profile" element={<ProfilePage />} />
               </Route>

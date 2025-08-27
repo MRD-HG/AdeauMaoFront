@@ -191,6 +191,16 @@ export const mockEquipment = [
     organes: []
   }
 ];
+export const mockBreakdownCauses = [
+  { id: 1, reference: 'PE', libelle: 'Panne électrique' },
+  { id: 2, reference: 'PM', libelle: 'Panne mécanique' },
+  { id: 3, reference: 'PH', libelle: 'Panne hydraulique (Fuite d\'eau)' },
+];
+export const mockCategories = [
+  { id: 1, reference: 'TR', categorie: 'Trémie' },
+  { id: 2, reference: 'TRVS', categorie: 'Trémie Vide Sac' },
+  { id: 3, reference: 'MLG', categorie: 'Mélangeur' },
+];
 export const mockTeams = [
   { id: 1, reference: 'ELEC', nom: 'Électriciens' },
   { id: 2, reference: 'MEC', nom: 'Mécaniciens' },

@@ -4,11 +4,15 @@ import {
   mockEquipment, 
   mockEmployees,
   mockBudgets,
+  mockCategories ,
+  mockWorkCenters ,
   mockWorkOrders, 
   mockInterventionRequests,
   mockTeams,
+  mockBreakdownCauses ,
   createMockApiResponse,
-  createMockPagedResponse 
+  createMockPagedResponse ,
+
 } from './mockData';
 
 // Demo mode flag - set to true to use mock data
@@ -45,7 +49,42 @@ export const setAuthTokens = (token, refresh) => {
     localStorage.removeItem('refreshToken');
   }
 };
-
+export const workCenterAPI = {
+  getAll: async (params = {}) => {
+    if (DEMO_MODE) {
+      await mockDelay();
+      return createMockPagedResponse(mockWorkCenters, params.pageNumber, params.pageSize);
+    }
+    return apiClient.get('/work-centers', { params });
+  },
+  create: async (data) => {
+    if (DEMO_MODE) {
+        await mockDelay();
+        const newCenter = { ...data, id: Date.now() };
+        mockWorkCenters.push(newCenter);
+        return createMockApiResponse(newCenter);
+    }
+    return apiClient.post('/work-centers', data);
+  },
+};
+export const breakdownCauseAPI = {
+  getAll: async (params = {}) => {
+    if (DEMO_MODE) {
+      await mockDelay();
+      return createMockPagedResponse(mockBreakdownCauses, params.pageNumber, params.pageSize);
+    }
+    return apiClient.get('/breakdown-causes', { params });
+  },
+  create: async (data) => {
+    if (DEMO_MODE) {
+        await mockDelay();
+        const newCause = { ...data, id: Date.now() };
+        mockBreakdownCauses.push(newCause);
+        return createMockApiResponse(newCause);
+    }
+    return apiClient.post('/breakdown-causes', data);
+  },
+};
 export const getAuthToken = () => {
   if (!authToken) {
     authToken = localStorage.getItem('authToken');
@@ -110,7 +149,24 @@ apiClient.interceptors.response.use(
     return Promise.reject(error);
   }
 );
-
+export const categoryAPI = {
+  getAll: async (params = {}) => {
+    if (DEMO_MODE) {
+      await mockDelay();
+      return createMockPagedResponse(mockCategories, params.pageNumber, params.pageSize);
+    }
+    return apiClient.get('/categories', { params });
+  },
+  create: async (data) => {
+    if (DEMO_MODE) {
+        await mockDelay();
+        const newCategory = { ...data, id: Date.now() };
+        mockCategories.push(newCategory);
+        return createMockApiResponse(newCategory);
+    }
+    return apiClient.post('/categories', data);
+  },
+};
 // API endpoints
 export const authAPI = {
   login: async (credentials) => {
