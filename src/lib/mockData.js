@@ -169,8 +169,7 @@ export const mockTeams = [
   { id: 1, reference: 'ELEC', nom: 'Électriciens' },
   { id: 2, reference: 'MEC', nom: 'Mécaniciens' },
   
-];
-export const mockWorkOrders = [
+];export const mockWorkOrders = [
   {
     id: 1,
     numeroOT: "OT-2024-001",
