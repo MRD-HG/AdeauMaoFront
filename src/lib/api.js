@@ -2,6 +2,8 @@ import axios from 'axios';
 import { 
   mockUser, 
   mockEquipment, 
+  mockEmployees,
+  mockBudgets,
   mockWorkOrders, 
   mockInterventionRequests,
   mockTeams,
@@ -289,8 +291,59 @@ export const equipmentAPI = {
     return apiClient.delete(`/equipements/organes/${organeId}`);
   },
 };
-
-
+export const budgetAPI = {
+  getAll: async (params = {}) => {
+    if (DEMO_MODE) {
+      await mockDelay();
+      // Calculer l'écart pour chaque budget
+      const budgetsWithVariance = mockBudgets.map(b => ({
+        ...b,
+        ecart: b.budgetReel - b.budgetPrevisionnel
+      }));
+      return createMockPagedResponse(budgetsWithVariance, params.pageNumber, params.pageSize);
+    }
+    return apiClient.get('/budgets', { params });
+  },
+  create: async (data) => {
+    if (DEMO_MODE) {
+      await mockDelay();
+      const newBudget = { ...data, id: Date.now() };
+      mockBudgets.push(newBudget);
+      return createMockApiResponse(newBudget);
+    }
+    return apiClient.post('/budgets', data);
+  },
+  // Ajoutez update et delete ici si nécessaire
+};
+export const userAPI = {
+  updateProfile: async (userId, data) => {
+    if (DEMO_MODE) {
+      await mockDelay();
+      console.log("Updating user profile:", userId, data);
+      // Dans une vraie application, vous mettriez à jour l'utilisateur dans la base de données
+      // et potentiellement le mockUser pour refléter les changements.
+      return createMockApiResponse({ ...mockUser, ...data });
+    }
+    return apiClient.put(`/users/${userId}/profile`, data);
+  }
+};
+export const dashboardAPI = {
+  getStats: async () => {
+    if (DEMO_MODE) {
+      await mockDelay(700); // Simule un petit temps de chargement
+      return createMockApiResponse({
+        equipmentCount: mockEquipment.length,
+        activeWorkOrders: mockWorkOrders.filter(wo => wo.statut === 'EnCours').length,
+        newInterventionRequests: mockInterventionRequests.filter(di => di.statut === 'Nouvelle').length,
+        teamCount: mockTeams.length,
+        // Prend les 5 ordres de travail les plus récents
+        recentWorkOrders: mockWorkOrders.sort((a, b) => new Date(b.dateCreation) - new Date(a.dateCreation)).slice(0, 5),
+      });
+    }
+    // L'appel à l'API réelle irait ici
+    return apiClient.get('/dashboard/stats');
+  }
+};
 export const workOrderAPI = {
   getAll: async (params = {}) => {
     if (DEMO_MODE) {

@@ -22,7 +22,10 @@ import EmployeeListPage from './pages/employees/EmployeeListPage';
 import TeamListPage from './pages/teams/TeamListPage';
 import ProfilePage from './pages/ProfilePage';
 import PlanningPage from './pages/planning/PlanningPage';
-
+import StatisticsPage from './pages/statistics/StatisticsPage';
+import ReportsPage from './pages/reports/ReportsPage';
+import BudgetsPage from './pages/budgets/BudgetsPage';
+import MaintenancePlansPage from './pages/maintenance-plans/MaintenancePlansPage'
 // Protected Route component
 import ProtectedRoute from './components/auth/ProtectedRoute';
 
@@ -64,15 +67,16 @@ function App() {
                 <Route path="intervention-requests" element={<InterventionRequestListPage />} />
                 <Route path="intervention-requests/:id" element={<InterventionRequestDetailsPage />} />
                 <Route path="planning" element={<PlanningPage />} />
-
+                <Route path="maintenance-plans" element={<MaintenancePlansPage />} />
                 {/* Management */}
                 <Route path="employees" element={<EmployeeListPage />} />
                 <Route path="teams" element={<TeamListPage />} />
-                <Route path="budgets" element={<PlaceholderPage title="Budgets de maintenance" description="Suivez les coûts et les budgets." cardTitle="Budgets" cardDescription="Fonctionnalité en cours de développement..." />} />
+                <Route path="budgets" element={<BudgetsPage />} />
 
                 {/* Analysis */}
-                <Route path="statistics" element={<PlaceholderPage title="Statistiques" description="Analysez les performances de maintenance." cardTitle="Statistiques et KPIs" cardDescription="Fonctionnalité en cours de développement..." />} />
-                <Route path="reports" element={<PlaceholderPage title="Rapports" description="Générez des rapports d'intervention." cardTitle="Rapports" cardDescription="Fonctionnalité en cours de développement..." />} />
+               <Route path="statistics" element={<StatisticsPage />} />
+               <Route path="reports" element={<ReportsPage />} />
+
 
                 {/* Profile */}
                 <Route path="profile" element={<ProfilePage />} />

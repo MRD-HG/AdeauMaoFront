@@ -15,6 +15,7 @@ import {
   Calendar,
   Wallet,
   FileText,
+  ClipboardCheck 
 } from 'lucide-react';
 
 const mainNavigation = [
@@ -23,6 +24,7 @@ const mainNavigation = [
 ];
 
 const maintenanceNavigation = [
+  { name: 'Plans de Maintenance', href: '/maintenance-plans', icon: ClipboardCheck }, // Ajoutez cette ligne
   { name: 'Ordres de travail', href: '/work-orders', icon: ClipboardList },
   { name: 'Demandes d\'intervention', href: '/intervention-requests', icon: AlertTriangle },
   { name: 'Calendrier', href: '/planning', icon: Calendar },
@@ -38,6 +40,7 @@ const analysisNavigation = [
     { name: 'Statistiques', href: '/statistics', icon: BarChart3 },
     { name: 'Rapports', href: '/reports', icon: FileText },
 ];
+
 
 const NavList = ({ items, isCollapsed, location }) => (
   <div className="space-y-2">

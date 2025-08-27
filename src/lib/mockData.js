@@ -1,13 +1,39 @@
 // Mock data for demo purposes
 export const mockUser = {
-  id: "1",
-  userName: "admin",
-  email: "admin@adeaumao.com",
-  firstName: "Admin",
-  lastName: "User",
-  roles: ["Administrator"]
+  id: 1,
+  nom: 'Roudani',
+  prenom: 'Mustapha',
+  email: 'roudani.Mustapha@adeaumao.com',
+  role: 'Administrator',
+  telephone: '+212 6 00 11 22 33',
+  adresse: '123 Rue de la Maintenance',
+  ville: 'Rabat',
+  pays: 'Maroc',
+  avatar: '/path/to/avatar.jpg' // Nous utiliserons une solution de repli pour l'instant
 };
-
+export const mockBudgets = [
+  {
+    id: 1,
+    annee: 2024,
+    mois: "Janvier",
+    budgetPrevisionnel: 15000,
+    budgetReel: 14500,
+  },
+  {
+    id: 2,
+    annee: 2024,
+    mois: "Février",
+    budgetPrevisionnel: 15000,
+    budgetReel: 16200,
+  },
+  {
+    id: 3,
+    annee: 2024,
+    mois: "Mars",
+    budgetPrevisionnel: 18000,
+    budgetReel: 17500,
+  },
+];
 export const mockEquipment = [
   {
     id: 1,
@@ -177,13 +203,13 @@ export const mockTeams = [
     equipementNom: "Compresseur Principal Atlas Copco",
     equipementReference: "EQ-001",
     descriptionTache: "Maintenance préventive trimestrielle - Vérification générale",
-    dateDebutPrevue: "2024-01-25T08:00:00Z",
-    dateFinPrevue: "2024-01-25T12:00:00Z",
+    dateDebutPrevue: "2025-08-25T08:00:00Z",
+    dateFinPrevue: "2025-08-25T12:00:00Z",
     technicienAssigneeId: 1,
     technicienNom: "Ahmed Alami",
     statut: "EnCours",
     priorite: "Moyenne",
-    dateDebutReelle: "2024-01-25T08:15:00Z",
+    dateDebutReelle: "2025-08-25T08:15:00Z",
     dateFinReelle: null,
     tempsPasse: 2.5,
     causePanneId: null,
@@ -203,8 +229,8 @@ export const mockTeams = [
     validateurNom: null,
     workflowId: 1,
     workflowNom: "Workflow Maintenance Standard",
-    dateCreation: "2024-01-20T10:00:00Z",
-    dateModification: "2024-01-25T10:30:00Z"
+    dateCreation: "2025-08-20T10:00:00Z",
+    dateModification: "2025-08-25T10:30:00Z"
   },
   {
     id: 2,
@@ -362,6 +388,30 @@ export const mockEmployees = [
     equipeNom: 'Mécaniciens'
   }
 ];
+export const mockKpiData = {
+  mttr: [
+    { month: 'Jan', value: 4.5 },
+    { month: 'Fev', value: 4.2 },
+    { month: 'Mar', value: 5.1 },
+    { month: 'Avr', value: 4.8 },
+    { month: 'Mai', value: 4.6 },
+    { month: 'Juin', value: 4.9 },
+  ],
+  mtbf: [
+    { month: 'Jan', value: 210 },
+    { month: 'Fev', value: 220 },
+    { month: 'Mar', value: 205 },
+    { month: 'Avr', value: 215 },
+    { month: 'Mai', value: 230 },
+    { month: 'Juin', value: 225 },
+  ],
+  equipmentAvailability: [
+    { name: 'Compresseurs', value: 98.5, fill: '#8884d8' },
+    { name: 'Pompes', value: 99.2, fill: '#82ca9d' },
+    { name: 'Moteurs', value: 97.8, fill: '#ffc658' },
+    { name: 'Ventilateurs', value: 99.5, fill: '#ff8042' },
+  ],
+};
 
 // Mock API responses
 export const createMockApiResponse = (data, success = true, message = "Opération réussie") => ({

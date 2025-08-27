@@ -12,7 +12,7 @@ export const useEmployeeList = (filters) => {
   return useQuery({
     queryKey: employeeKeys.list(filters),
     queryFn: () => employeeAPI.getAll(filters),
-    select: (data) => data.data.data,
+    select: (data) => data.data.data, 
   });
 };
 
@@ -26,4 +26,28 @@ export const useCreateEmployee = () => {
     },
     onError: (err) => toast.error(err.message || "Erreur lors de l'ajout."),
   });
+};
+
+export const useUpdateEmployee = () => {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: ({ id, data }) => employeeAPI.update(id, data),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: employeeKeys.lists() });
+            toast.success("Employé mis à jour avec succès.");
+        },
+        onError: (err) => toast.error(err.message || "Erreur lors de la mise à jour."),
+    });
+};
+
+export const useDeleteEmployee = () => {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: employeeAPI.delete,
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: employeeKeys.lists() });
+            toast.success("Employé supprimé avec succès.");
+        },
+        onError: (err) => toast.error(err.message || "Erreur lors de la suppression."),
+    });
 };
