@@ -55,10 +55,7 @@ export const mockBreakdownCauses = [
   { id: 2, reference: 'PM', libelle: 'Panne mécanique' },
   { id: 3, reference: 'PH', libelle: 'Panne hydraulique (Fuite d\'eau)' },
 ];
-export const mockWorkflows = [
-  { id: 1, reference: 'WF-STD', nom: 'Workflow Maintenance Standard', type: 'Correctif', statut: 'Actif', agent: 'Ahmed Alami', approbateur1: 'Hassan Bennani', approbateur2: 'Fatima Zahra', approbateur3: null, dateDebut: '2024-01-01T00:00:00Z' },
-  { id: 2, reference: 'WF-URG', nom: 'Workflow Urgence Production', type: 'Préventif', statut: 'Actif', agent: 'Youssef Alaoui', approbateur1: 'Aicha Benali', approbateur2: null, approbateur3: null, dateDebut: '2024-02-15T00:00:00Z' },
-];
+
 const managementNavigation = [
   { name: "Employés", href: "/employees", icon: Users },
   { name: "Équipes", href: "/teams", icon: UserCheck },

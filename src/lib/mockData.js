@@ -34,6 +34,10 @@ export const mockBudgets = [
     budgetReel: 17500,
   },
 ];
+export const mockWorkflows = [
+  { id: 1, reference: 'WF-STD', nom: 'Workflow Maintenance Standard', type: 'Correctif', statut: 'Actif', agent: 'Ahmed Alami', approbateur1: 'Hassan Bennani', approbateur2: 'Fatima Zahra', approbateur3: null, dateDebut: '2024-01-01T00:00:00Z' },
+  { id: 2, reference: 'WF-URG', nom: 'Workflow Urgence Production', type: 'Préventif', statut: 'Actif', agent: 'Youssef Alaoui', approbateur1: 'Aicha Benali', approbateur2: null, approbateur3: null, dateDebut: '2024-02-15T00:00:00Z' },
+];
 export const mockEquipment = [
   {
     id: 1,

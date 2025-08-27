@@ -53,39 +53,22 @@ export const setAuthTokens = (token, refresh) => {
   }
 };
 export const workflowAPI = {
-
   getAll: async (params = {}) => {
-
     if (DEMO_MODE) {
-
       await mockDelay();
-
       return createMockPagedResponse(mockWorkflows, params.pageNumber, params.pageSize);
-
     }
-
     return apiClient.get('/workflows', { params });
-
   },
-
   create: async (data) => {
-
     if (DEMO_MODE) {
-
         await mockDelay();
-
         const newWorkflow = { ...data, id: Date.now(), statut: 'Actif' };
-
         mockWorkflows.push(newWorkflow);
-
         return createMockApiResponse(newWorkflow);
-
     }
-
     return apiClient.post('/workflows', data);
-
   },
-
 };
 export const subcontractorAPI = {
   getAll: async (params = {}) => {
