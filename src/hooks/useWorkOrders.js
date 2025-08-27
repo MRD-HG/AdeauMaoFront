@@ -18,4 +18,48 @@ export const useWorkOrderList = (filters) => {
   });
 };
 
-// ... Ajoutez ici les autres hooks (useWorkOrder, useCreateWorkOrder, etc.) en suivant le même modèle
+export const useWorkOrder = (id) => {
+  return useQuery({
+    queryKey: workOrderKeys.detail(id),
+    queryFn: () => workOrderAPI.getById(id),
+    select: (data) => data.data.data,
+    enabled: !!id,
+  });
+};
+
+export const useCreateWorkOrder = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: workOrderAPI.create,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: workOrderKeys.lists() });
+      toast.success("Ordre de travail créé avec succès.");
+    },
+    onError: (err) => toast.error(err.message || "Erreur lors de la création de l'OT."),
+  });
+};
+
+export const useUpdateWorkOrder = () => {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: ({ id, data }) => workOrderAPI.update(id, data),
+        onSuccess: (data, variables) => {
+            queryClient.invalidateQueries({ queryKey: workOrderKeys.lists() });
+            queryClient.invalidateQueries({ queryKey: workOrderKeys.detail(variables.id) });
+            toast.success("Ordre de travail mis à jour.");
+        },
+        onError: (err) => toast.error(err.message || "Erreur lors de la mise à jour."),
+    });
+};
+
+export const useDeleteWorkOrder = () => {
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: workOrderAPI.delete,
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: workOrderKeys.lists() });
+            toast.success("Ordre de travail supprimé.");
+        },
+        onError: (err) => toast.error(err.message || "Erreur lors de la suppression."),
+    });
+};

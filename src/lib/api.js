@@ -291,26 +291,137 @@ export const equipmentAPI = {
 };
 
 export const workOrderAPI = {
-  getAll: (params) => apiClient.get('/ordresdetravail', { params }),
-  getById: (id) => apiClient.get(`/ordresdetravail/${id}`),
-  create: (data) => apiClient.post('/ordresdetravail', data),
-  update: (id, data) => apiClient.put(`/ordresdetravail/${id}`, data),
-  delete: (id) => apiClient.delete(`/ordresdetravail/${id}`),
-  updateProgress: (id, data) => apiClient.patch(`/ordresdetravail/${id}/progression`, data),
-  validate: (id, data) => apiClient.post(`/ordresdetravail/${id}/validate`, data),
-  generateNumber: () => apiClient.get('/ordresdetravail/generate-numero'),
+  getAll: async (params = {}) => {
+    if (DEMO_MODE) {
+      await mockDelay();
+      let filtered = [...mockWorkOrders];
+      
+      // Filter by status
+      if (params.etat) {
+        filtered = filtered.filter(wo => wo.statut === params.etat);
+      }
+      
+      // Filter by search term
+      if (params.searchTerm) {
+        const searchTerm = params.searchTerm.toLowerCase();
+        filtered = filtered.filter(wo =>
+          wo.numeroOT.toLowerCase().includes(searchTerm) ||
+          wo.equipementNom.toLowerCase().includes(searchTerm) ||
+          wo.technicienNom.toLowerCase().includes(searchTerm)
+        );
+      }
+      
+      return createMockPagedResponse(filtered, params.pageNumber, params.pageSize);
+    }
+    return apiClient.get('/ordresdetravail', { params });
+  },
+  getById: async (id) => {
+     if (DEMO_MODE) {
+        await mockDelay();
+        const workOrder = mockWorkOrders.find(wo => wo.id === parseInt(id));
+        return createMockApiResponse(workOrder);
+     }
+     return apiClient.get(`/ordresdetravail/${id}`);
+  },
+  create: async (data) => {
+    if (DEMO_MODE) {
+      await mockDelay();
+      const newWorkOrder = {
+        ...data,
+        id: Date.now(),
+        numeroOT: `OT-2024-${mockWorkOrders.length + 10}`,
+        dateCreation: new Date().toISOString(),
+        pourcentageProgression: 0,
+        statut: 'AFaire'
+      };
+      mockWorkOrders.unshift(newWorkOrder);
+      return createMockApiResponse(newWorkOrder);
+    }
+    return apiClient.post('/ordresdetravail', data);
+  },
+  update: async (id, data) => {
+    if (DEMO_MODE) {
+      await mockDelay();
+      const index = mockWorkOrders.findIndex(wo => wo.id === parseInt(id));
+      if (index > -1) {
+        mockWorkOrders[index] = { ...mockWorkOrders[index], ...data };
+      }
+      return createMockApiResponse(mockWorkOrders[index]);
+    }
+    return apiClient.put(`/ordresdetravail/${id}`, data);
+  },
+  delete: async (id) => {
+    if (DEMO_MODE) {
+      await mockDelay();
+      const index = mockWorkOrders.findIndex(wo => wo.id === parseInt(id));
+      if (index > -1) {
+        mockWorkOrders.splice(index, 1);
+      }
+      return createMockApiResponse(null);
+    }
+    return apiClient.delete(`/ordresdetravail/${id}`);
+  },
 };
-
 export const interventionRequestAPI = {
-  getAll: (params) => apiClient.get('/demandesintervention', { params }),
-  getById: (id) => apiClient.get(`/demandesintervention/${id}`),
-  create: (data) => apiClient.post('/demandesintervention', data),
-  update: (id, data) => apiClient.put(`/demandesintervention/${id}`, data),
-  delete: (id) => apiClient.delete(`/demandesintervention/${id}`),
-  updateStatus: (id, data) => apiClient.patch(`/demandesintervention/${id}/statut`, data),
-  createWorkOrder: (id, data) => apiClient.post(`/demandesintervention/${id}/create-ot`, data),
+  getAll: async (params = {}) => {
+    if (DEMO_MODE) {
+      await mockDelay();
+      let filtered = [...mockInterventionRequests];
+      
+      if (params.statut) {
+        filtered = filtered.filter(di => di.statut === params.statut);
+      }
+      
+      return createMockPagedResponse(filtered, params.pageNumber, params.pageSize);
+    }
+    return apiClient.get('/demandesintervention', { params });
+  },
+  getById: async (id) => {
+    if (DEMO_MODE) {
+      await mockDelay();
+      const request = mockInterventionRequests.find(r => r.id === parseInt(id));
+      return createMockApiResponse(request);
+    }
+    return apiClient.get(`/demandesintervention/${id}`);
+  },
+  create: async (data) => {
+    if (DEMO_MODE) {
+      await mockDelay();
+      const newRequest = {
+        ...data,
+        id: Date.now(),
+        dateCreation: new Date().toISOString(),
+        dateModification: new Date().toISOString(),
+        statut: 'Nouvelle',
+      };
+      mockInterventionRequests.unshift(newRequest);
+      return createMockApiResponse(newRequest);
+    }
+    return apiClient.post('/demandesintervention', data);
+  },
+  update: async (id, data) => {
+    if (DEMO_MODE) {
+      await mockDelay();
+      const index = mockInterventionRequests.findIndex(r => r.id === parseInt(id));
+      if (index > -1) {
+        mockInterventionRequests[index] = { ...mockInterventionRequests[index], ...data, dateModification: new Date().toISOString() };
+      }
+      return createMockApiResponse(mockInterventionRequests[index]);
+    }
+    return apiClient.put(`/demandesintervention/${id}`, data);
+  },
+  delete: async (id) => {
+    if (DEMO_MODE) {
+      await mockDelay();
+      const index = mockInterventionRequests.findIndex(r => r.id === parseInt(id));
+      if (index > -1) {
+        mockInterventionRequests.splice(index, 1);
+      }
+      return createMockApiResponse(null);
+    }
+    return apiClient.delete(`/demandesintervention/${id}`);
+  },
 };
-
 export const employeeAPI = {
   getAll: (params) => apiClient.get('/employes', { params }),
   getById: (id) => apiClient.get(`/employes/${id}`),
