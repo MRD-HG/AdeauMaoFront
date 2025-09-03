@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import { Link } from "react-router-dom";
 import {
   Table,
@@ -10,81 +10,20 @@ import {
 } from "../ui/table";
 import { Button } from "../ui/button";
 import { Badge } from "../ui/badge";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "../ui/dropdown-menu";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "../ui/alert-dialog";
-import {
-  MoreHorizontal,
-  Eye,
-  Edit,
-  Trash2,
-  Wrench,
-  MapPin,
-  Calendar,
-} from "lucide-react";
-import { formatDate, getStatusColor, truncateText } from "../../lib/utils";
-import { useDeleteEquipment } from "../../hooks/useEquipment";
-import { useAuth } from "../../contexts/AuthContext";
-import { motion } from "framer-motion";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "../ui/dropdown-menu";
+import { MoreHorizontal, Eye, Edit, Trash2 } from "lucide-react";
+import { formatDate, getStatusColor, formatCurrency, getCriticiteColor } from "../../lib/utils";
+import { TableSpinner } from "../ui/loading-spinner";
 
-const EquipmentTable = ({ equipment = [], isLoading = false, onEdit }) => {
-  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [equipmentToDelete, setEquipmentToDelete] = useState(null);
-
-  const { hasAnyRole } = useAuth();
-  const deleteEquipmentMutation = useDeleteEquipment();
-
-  const canEdit = hasAnyRole(["Administrator", "Manager"]);
-  const canDelete = hasAnyRole(["Administrator"]);
-
-  const handleDeleteClick = (equipment) => {
-    setEquipmentToDelete(equipment);
-    setDeleteDialogOpen(true);
-  };
-
-  const handleDeleteConfirm = async () => {
-    if (equipmentToDelete) {
-      await deleteEquipmentMutation.mutateAsync(equipmentToDelete.id);
-      setDeleteDialogOpen(false);
-      setEquipmentToDelete(null);
-    }
-  };
-
+const EquipmentTable = ({ equipment = [], isLoading = false, onEdit, onDelete }) => {
   if (isLoading) {
-    return (
-      <div className="space-y-3">
-        {[...Array(5)].map((_, i) => (
-          <div key={i} className="h-16 bg-gray-100 rounded-lg animate-pulse" />
-        ))}
-      </div>
-    );
+    return <TableSpinner />;
   }
 
   if (!equipment.length) {
     return (
-      <div className="text-center py-12">
-        <Wrench className="mx-auto h-12 w-12 text-gray-400 mb-4" />
-        <h3 className="text-lg font-medium text-gray-900 mb-2">
-          Aucun équipement trouvé
-        </h3>
-        <p className="text-gray-500">
-          Commencez par ajouter votre premier équipement.
-        </p>
+      <div className="text-center py-12 text-muted-foreground">
+        No results found.
       </div>
     );
   }
@@ -95,144 +34,63 @@ const EquipmentTable = ({ equipment = [], isLoading = false, onEdit }) => {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Référence</TableHead>
-              <TableHead>Nom</TableHead>
-              <TableHead>Type</TableHead>
-              <TableHead>Fabricant</TableHead>
-              <TableHead>Localisation</TableHead>
-              <TableHead>État</TableHead>
-              <TableHead>Date de mise en service</TableHead>
-              <TableHead className="w-[70px]"></TableHead>
+              <TableHead>Reference</TableHead>
+              <TableHead>Equipment Name</TableHead>
+              <TableHead>Category</TableHead>
+              <TableHead>Brand</TableHead>
+              <TableHead>Purchase Date</TableHead>
+              <TableHead>Purchase Price</TableHead>
+              <TableHead>Maintenance Cost</TableHead>
+              <TableHead>In Service Date</TableHead>
+              <TableHead>Status</TableHead>
+              <TableHead>Criticality</TableHead>
+              <TableHead className="w-[70px]">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {equipment.map((item, index) => (
-              <motion.tr
-                key={item.id}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.3, delay: index * 0.05 }}
-                className="group hover:bg-gray-50"
-              >
-                <TableCell className="font-medium">
-                  <Link
-                    to={`/equipment/${item.id}`}
-                    className="text-primary hover:text-primary/80 font-mono"
-                  >
-                    {item.reference}
-                  </Link>
+            {equipment.map((item) => (
+              <TableRow key={item.id} className="group hover:bg-gray-50">
+                <TableCell className="font-mono text-primary hover:underline">
+                  <Link to={`/equipment/${item.id}`}>{item.reference}</Link>
                 </TableCell>
-                <TableCell>
-                  <div>
-                    <div className="font-medium text-gray-900">
-                      {truncateText(item.nom, 30)}
-                    </div>
-                    {item.description && (
-                      <div className="text-sm text-gray-500">
-                        {truncateText(item.description, 40)}
-                      </div>
-                    )}
-                  </div>
-                </TableCell>
-                <TableCell>
-                  <div className="flex items-center">
-                    <Wrench className="h-4 w-4 text-gray-400 mr-2" />
-                    {item.typeEquipement || "-"}
-                  </div>
-                </TableCell>
-                <TableCell>
-                  <div className="text-sm">
-                    <div className="font-medium">{item.fabricant || "-"}</div>
-                    {item.modele && (
-                      <div className="text-gray-500">{item.modele}</div>
-                    )}
-                  </div>
-                </TableCell>
-                <TableCell>
-                  <div className="flex items-center text-sm text-gray-600">
-                    <MapPin className="h-4 w-4 mr-1" />
-                    {truncateText(item.localisation, 25) || "-"}
-                  </div>
-                </TableCell>
+                <TableCell className="font-medium">{item.nom}</TableCell>
+                <TableCell>{item.categorie || "-"}</TableCell>
+                <TableCell>{item.fabricant || "-"}</TableCell>
+                <TableCell>{formatDate(item.dateAchat) || "-"}</TableCell>
+                <TableCell>{formatCurrency(item.prixAchat) || "-"}</TableCell>
+                <TableCell>{formatCurrency(item.coutMaintenance) || "-"}</TableCell>
+                <TableCell>{formatDate(item.dateMiseEnService) || "-"}</TableCell>
                 <TableCell>
                   <Badge className={getStatusColor(item.etatOperationnel)}>
-                    {item.etatOperationnel || "Non défini"}
+                    {item.etatOperationnel || "N/A"}
                   </Badge>
                 </TableCell>
                 <TableCell>
-                  <div className="flex items-center text-sm text-gray-600">
-                    <Calendar className="h-4 w-4 mr-1" />
-                    {formatDate(item.dateMiseEnService) || "-"}
-                  </div>
+                  <Badge variant="outline" className={getCriticiteColor(item.criticite)}>
+                    {item.criticite || "N/A"}
+                  </Badge>
                 </TableCell>
                 <TableCell>
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <Button
-                        variant="ghost"
-                        className="h-8 w-8 p-0 opacity-0 group-hover:opacity-100 transition-opacity"
-                      >
+                      <Button variant="ghost" className="h-8 w-8 p-0 opacity-0 group-hover:opacity-100 transition-opacity">
                         <MoreHorizontal className="h-4 w-4" />
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
-                      <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                      <DropdownMenuSeparator />
                       <DropdownMenuItem asChild>
-                        <Link to={`/equipment/${item.id}`}>
-                          <Eye className="mr-2 h-4 w-4" />
-                          Voir les détails
-                        </Link>
+                        <Link to={`/equipment/${item.id}`}><Eye className="mr-2 h-4 w-4" />View Details</Link>
                       </DropdownMenuItem>
-                      {canEdit && (
-                        <DropdownMenuItem onClick={() => onEdit(item)}>
-                          <Edit className="mr-2 h-4 w-4" />
-                          Modifier
-                        </DropdownMenuItem>
-                      )}
-                      {canDelete && (
-                        <DropdownMenuItem
-                          onClick={() => handleDeleteClick(item)}
-                          className="text-red-600"
-                        >
-                          <Trash2 className="mr-2 h-4 w-4" />
-                          Supprimer
-                        </DropdownMenuItem>
-                      )}
+                      <DropdownMenuItem onClick={() => onEdit(item)}><Edit className="mr-2 h-4 w-4" />Edit</DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => onDelete(item)} className="text-red-600"><Trash2 className="mr-2 h-4 w-4" />Delete</DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
                 </TableCell>
-              </motion.tr>
+              </TableRow>
             ))}
           </TableBody>
         </Table>
       </div>
-
-      {/* Delete confirmation dialog */}
-      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Confirmer la suppression</AlertDialogTitle>
-            <AlertDialogDescription>
-              Êtes-vous sûr de vouloir supprimer l'équipement "
-              {equipmentToDelete?.nom}" ? Cette action est irréversible et
-              supprimera également tous les ordres de travail associés.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Annuler</AlertDialogCancel>
-            <AlertDialogAction
-              onClick={handleDeleteConfirm}
-              className="bg-red-600 hover:bg-red-700"
-              disabled={deleteEquipmentMutation.isPending}
-            >
-              {deleteEquipmentMutation.isPending
-                ? "Suppression..."
-                : "Supprimer"}
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
     </>
   );
 };

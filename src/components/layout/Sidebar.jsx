@@ -1,189 +1,161 @@
-import React from "react";
-import { NavLink, useLocation } from "react-router-dom";
-import { cn } from "../../lib/utils";
+import React from 'react';
+import { NavLink, useLocation } from 'react-router-dom';
+import { cn } from '../../lib/utils';
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from '../ui/accordion';
 import {
   LayoutDashboard,
   Wrench,
-  ClipboardList,
-  AlertTriangle,
-  Users,
-  UserCheck,
-  Settings,
-  ChevronLeft,
+  ChevronDown,
   ChevronRight,
-  BarChart3,
+  Settings,
+  Archive,
   Calendar,
-  Wallet,
-  FileText,
-  ClipboardCheck,
-  SlidersHorizontal,
-} from "lucide-react";
+  Users,
+  ShoppingCart,
+  BarChart3,
+  Database,
+} from 'lucide-react';
 
-const mainNavigation = [
-  { name: "Tableau de bord", href: "/dashboard", icon: LayoutDashboard },
-  { name: "Équipements", href: "/equipment", icon: Wrench },
-];
-const settingsNavigation = [
-  { name: "Catégories", href: "/settings/categories", icon: SlidersHorizontal },
-  { name: 'Causes de Panne', href: '/settings/breakdown-causes', icon: SlidersHorizontal },
-  { name: 'Postes de Travail', href: '/settings/work-centers', icon: SlidersHorizontal }, 
-  { name: 'Déclencheurs', href: '/settings/triggers', icon: SlidersHorizontal },
-  { name: 'Sous-traitants', href: '/settings/subcontractors', icon: SlidersHorizontal }, 
-  { name: 'Workflows', href: '/settings/workflows', icon: SlidersHorizontal },
-];
-const maintenanceNavigation = [
+const navigationItems = [
   {
-    name: "Plans de Maintenance",
-    href: "/maintenance-plans",
-    icon: ClipboardCheck,
-  }, // Ajoutez cette ligne
-  { name: "Ordres de travail", href: "/work-orders", icon: ClipboardList },
-  {
-    name: "Demandes d'intervention",
-    href: "/intervention-requests",
-    icon: AlertTriangle,
+    name: 'Dashboard',
+    href: '/dashboard',
+    icon: LayoutDashboard,
   },
-  { name: "Calendrier", href: "/planning", icon: Calendar },
-];
-export const mockWorkCenters = [
-  { id: 1, designation: '40 semaines' },
-  { id: 2, designation: '24/24' },
-  { id: 3, designation: '6 sur 7' },
-];
-export const mockBreakdownCauses = [
-  { id: 1, reference: 'PE', libelle: 'Panne électrique' },
-  { id: 2, reference: 'PM', libelle: 'Panne mécanique' },
-  { id: 3, reference: 'PH', libelle: 'Panne hydraulique (Fuite d\'eau)' },
+  {
+    name: 'Maintenance',
+    icon: Wrench,
+    subItems: [
+      { name: 'Preventive', href: '/maintenance-plans' },
+      { name: 'Corrective', href: '/work-orders' },
+      { name: 'Intervention Requests', href: '/intervention-requests' },
+    ],
+  },
+  {
+    name: 'Equipment',
+    icon: Archive,
+    subItems: [
+      { name: 'Equipment List', href: '/equipment' },
+      { name: 'Categories', href: '/settings/categories' },
+      // Organs and Locations would be added here once their pages are created
+    ],
+  },
+  {
+    name: 'Planning',
+    icon: Calendar,
+    subItems: [
+      { name: 'Calendar', href: '/planning' },
+      // Schedule page would be added here
+    ],
+  },
+  {
+    name: 'Resources',
+    icon: Users,
+    subItems: [
+      { name: 'Teams', href: '/teams' },
+      { name: 'Staff', href: '/employees' },
+      { name: 'Subcontractors', href: '/settings/subcontractors' },
+      { name: 'Workstations', href: '/settings/work-centers' },
+    ],
+  },
+  {
+    name: 'Reports',
+    icon: BarChart3,
+    subItems: [
+        { name: 'Interventions', href: '/reports' },
+        { name: 'Statistics & KPIs', href: '/statistics' },
+    ],
+  },
+  {
+    name: 'Master Data',
+    icon: Database,
+    subItems: [
+        { name: 'Breakdown Causes', href: '/settings/breakdown-causes' },
+        { name: 'Triggers', href: '/settings/triggers' },
+        { name: 'Workflows', href: '/settings/workflows' },
+        { name: 'Budgets', href: '/budgets' },
+    ],
+  },
 ];
 
-const managementNavigation = [
-  { name: "Employés", href: "/employees", icon: Users },
-  { name: "Équipes", href: "/teams", icon: UserCheck },
-  { name: "Budgets", href: "/budgets", icon: Wallet },
-];
-
-const analysisNavigation = [
-  { name: "Statistiques", href: "/statistics", icon: BarChart3 },
-  { name: "Rapports", href: "/reports", icon: FileText },
-];
-
-const NavList = ({ items, isCollapsed, location }) => (
-  <div className="space-y-2">
-    {items.map((item) => {
-      const isActive = location.pathname.startsWith(item.href);
-      return (
-        <NavLink
-          key={item.name}
-          to={item.href}
-          className={cn(
-            "flex items-center px-3 py-2 rounded-lg text-sm font-medium transition-colors",
-            isActive
-              ? "bg-primary text-primary-foreground"
-              : "text-gray-700 hover:bg-gray-100",
-            isCollapsed ? "justify-center" : "justify-start"
-          )}
-          title={isCollapsed ? item.name : undefined}
-        >
-          <item.icon className={cn("h-5 w-5", !isCollapsed && "mr-3")} />
-          {!isCollapsed && <span>{item.name}</span>}
-        </NavLink>
-      );
-    })}
-  </div>
-);
-
-const Sidebar = ({ isCollapsed, onToggle }) => {
+const Sidebar = () => {
   const location = useLocation();
 
+  const isSubItemActive = (subItems) => {
+    return subItems.some(item => location.pathname.startsWith(item.href));
+  };
+
   return (
-    <div
-      className={cn(
-        "bg-white border-r border-gray-200 flex flex-col transition-all duration-300",
-        isCollapsed ? "w-16" : "w-64"
-      )}
-    >
-      <div className="flex items-center justify-between p-4 border-b border-gray-200">
-        {!isCollapsed && (
-          <div className="flex items-center space-x-2">
-            <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
-              <Settings className="h-5 w-5 text-primary-foreground" />
-            </div>
-            <span className="font-bold text-lg text-gray-900">AdeauMao</span>
-          </div>
-        )}
-        <button
-          onClick={onToggle}
-          className="p-1.5 rounded-lg hover:bg-gray-100 transition-colors"
-        >
-          {isCollapsed ? (
-            <ChevronRight className="h-4 w-4" />
-          ) : (
-            <ChevronLeft className="h-4 w-4" />
-          )}
-        </button>
+    <div className="bg-white border-r border-gray-200 flex flex-col w-64 h-screen">
+      {/* Header */}
+      <div className="flex items-center p-4 border-b border-gray-200">
+        <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center mr-3">
+          <Settings className="h-5 w-5 text-primary-foreground" />
+        </div>
+        <span className="font-bold text-lg text-gray-900">Maintenance System</span>
       </div>
 
-      <nav className="flex-1 p-4 space-y-4 overflow-y-auto">
-        <NavList
-          items={mainNavigation}
-          isCollapsed={isCollapsed}
-          location={location}
-        />
-        <div>
-          {!isCollapsed && (
-            <h3 className="px-3 text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">
-              Maintenance
-            </h3>
+      {/* Navigation */}
+      <nav className="flex-1 p-4 space-y-2 overflow-y-auto">
+        <Accordion type="multiple" className="w-full">
+          {navigationItems.map((item, index) =>
+            item.subItems ? (
+              <AccordionItem value={`item-${index}`} key={item.name} className="border-b-0">
+                <AccordionTrigger
+                  className={cn(
+                    "flex items-center w-full p-2 rounded-lg text-sm font-medium hover:bg-gray-100 hover:no-underline",
+                    isSubItemActive(item.subItems) && "text-primary"
+                  )}
+                >
+                  <div className="flex items-center">
+                    <item.icon className="h-5 w-5 mr-3" />
+                    {item.name}
+                  </div>
+                </AccordionTrigger>
+                <AccordionContent className="pl-6 pt-2 pb-0">
+                  <div className="flex flex-col space-y-2">
+                    {item.subItems.map((subItem) => (
+                      <NavLink
+                        key={subItem.name}
+                        to={subItem.href}
+                        className={({ isActive }) =>
+                          cn(
+                            "block p-2 rounded-md text-sm hover:bg-gray-100",
+                            isActive ? "bg-gray-200 font-semibold" : "text-gray-700"
+                          )
+                        }
+                      >
+                        {subItem.name}
+                      </NavLink>
+                    ))}
+                  </div>
+                </AccordionContent>
+              </AccordionItem>
+            ) : (
+              <NavLink
+                key={item.name}
+                to={item.href}
+                className={({ isActive }) =>
+                  cn(
+                    "flex items-center p-2 rounded-lg text-sm font-medium",
+                    isActive
+                      ? "bg-primary text-primary-foreground"
+                      : "text-gray-700 hover:bg-gray-100"
+                  )
+                }
+              >
+                <item.icon className="h-5 w-5 mr-3" />
+                {item.name}
+              </NavLink>
+            )
           )}
-          <NavList
-            items={maintenanceNavigation}
-            isCollapsed={isCollapsed}
-            location={location}
-          />
-        </div>
-        <div>
-          {!isCollapsed && (
-            <h3 className="px-3 text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">
-              Gestion
-            </h3>
-          )}
-          <NavList
-            items={managementNavigation}
-            isCollapsed={isCollapsed}
-            location={location}
-          />
-        </div>
-        <div>
-          {!isCollapsed && (
-            <h3 className="px-3 text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">
-              Analyse
-            </h3>
-          )}
-          <NavList
-            items={analysisNavigation}
-            isCollapsed={isCollapsed}
-            location={location}
-          />
-        </div>
-        <div>
-          {!isCollapsed && (
-            <h3 className="px-3 text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">
-              Paramètres
-            </h3>
-          )}
-          <NavList
-            items={settingsNavigation}
-            isCollapsed={isCollapsed}
-            location={location}
-          />
-        </div>
+        </Accordion>
       </nav>
-
-      {!isCollapsed && (
-        <div className="p-4 border-t border-gray-200">
-          <div className="text-xs text-gray-500 text-center">Version 1.0.0</div>
-        </div>
-      )}
     </div>
   );
 };

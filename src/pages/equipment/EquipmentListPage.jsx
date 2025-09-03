@@ -1,39 +1,21 @@
 import React, { useState } from 'react';
 import { Button } from '../../components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/card';
-import {
-  Pagination,
-  PaginationContent,
-  PaginationEllipsis,
-  PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
-} from '../../components/ui/pagination';
-import { Plus, Download, Upload } from 'lucide-react';
-import { motion } from 'framer-motion';
-import { useEquipmentList, useCreateEquipment, useUpdateEquipment } from '../../hooks/useEquipment';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '../../components/ui/card';
+import { Plus, Printer, Copy, FileText, FileSpreadsheet } from 'lucide-react';
+import { useEquipmentList, useCreateEquipment, useUpdateEquipment, useDeleteEquipment } from '../../hooks/useEquipment';
 import { useAuth } from '../../contexts/AuthContext';
 import EquipmentTable from '../../components/equipment/EquipmentTable';
-import EquipmentFilters from '../../components/equipment/EquipmentFilters';
 import EquipmentForm from '../../components/equipment/EquipmentForm';
 import { Dialog, DialogTrigger } from '../../components/ui/dialog';
+import { Input } from '../../components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../components/ui/select';
+import { DeleteConfirmationDialog } from '../../components/ui/confirmation-dialog';
+import EquipmentStats from '../../components/equipment/EquipmentStats'; // Import the new stats component
 
 const EquipmentListPage = () => {
-  const [filters, setFilters] = useState({
-    pageNumber: 1,
-    pageSize: 10,
-    searchTerm: '',
-    typeEquipement: '',
-    fabricant: '',
-    etatOperationnel: '',
-    dateFrom: '',
-    dateTo: '',
-    sortBy: 'nom',
-    sortDescending: false,
-  });
-
+  const [filters, setFilters] = useState({ pageNumber: 1, pageSize: 10, searchTerm: '' });
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [selectedEquipment, setSelectedEquipment] = useState(null);
 
   const { hasAnyRole } = useAuth();
@@ -42,37 +24,12 @@ const EquipmentListPage = () => {
   const { data, isLoading, error } = useEquipmentList(filters);
   const createEquipmentMutation = useCreateEquipment();
   const updateEquipmentMutation = useUpdateEquipment();
+  const deleteEquipmentMutation = useDeleteEquipment();
 
-  const handleFiltersChange = (newFilters) => {
-    setFilters(newFilters);
-  };
-
-  const handleClearFilters = () => {
-    setFilters({
-      pageNumber: 1,
-      pageSize: 10,
-      searchTerm: '',
-      typeEquipement: '',
-      fabricant: '',
-      etatOperationnel: '',
-      dateFrom: '',
-      dateTo: '',
-      sortBy: 'nom',
-      sortDescending: false,
-    });
-  };
-
-  const handlePageChange = (page) => {
-    setFilters(prev => ({ ...prev, pageNumber: page }));
-  };
-  
   const handleFormSubmit = (formData) => {
     if (selectedEquipment) {
       updateEquipmentMutation.mutate({ id: selectedEquipment.id, data: formData }, {
-        onSuccess: () => {
-          setDialogOpen(false);
-          setSelectedEquipment(null);
-        },
+        onSuccess: () => { setDialogOpen(false); setSelectedEquipment(null); },
       });
     } else {
       createEquipmentMutation.mutate(formData, {
@@ -86,168 +43,117 @@ const EquipmentListPage = () => {
     setDialogOpen(true);
   };
   
-    const openDialogForEdit = (equipment) => {
+  const openDialogForEdit = (equipment) => {
     setSelectedEquipment(equipment);
     setDialogOpen(true);
   };
 
+  const openDeleteDialog = (equipment) => {
+    setSelectedEquipment(equipment);
+    setDeleteDialogOpen(true);
+  };
 
-  const equipment = data?.data?.items || [];
-  const totalCount = data?.data?.totalCount || 0;
-  const totalPages = data?.data?.totalPages || 0;
-  const currentPage = data?.data?.pageNumber || 1;
+  const handleDeleteConfirm = () => {
+    deleteEquipmentMutation.mutate(selectedEquipment.id, {
+        onSuccess: () => setDeleteDialogOpen(false)
+    });
+  };
+
+  const equipmentList = data?.data?.items || [];
+  
+  // Mock stats - replace with actual data from your API
+  const equipmentStats = {
+    total: data?.data?.totalCount || 0,
+    active: equipmentList.filter(e => e.etatOperationnel === 'En service').length,
+    inMaintenance: equipmentList.filter(e => e.etatOperationnel === 'En maintenance').length,
+    critical: equipmentList.filter(e => e.criticite === 'Haute criticité').length,
+  };
 
   return (
-    <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-      <div className="space-y-6">
-        {/* Header */}
-        <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-          className="flex items-center justify-between"
-        >
-          <div>
-            <h1 className="text-3xl font-bold text-gray-900">Équipements</h1>
-            <p className="text-gray-600 mt-1">
-              Gestion des équipements industriels ({totalCount} équipements)
-            </p>
-          </div>
-          <div className="flex space-x-3">
-            <Button variant="outline" size="sm">
-              <Download className="mr-2 h-4 w-4" />
-              Exporter
-            </Button>
-            <Button variant="outline" size="sm">
-              <Upload className="mr-2 h-4 w-4" />
-              Importer
-            </Button>
+    <>
+      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+        <div className="space-y-6">
+          {/* Header */}
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-2xl font-bold">Equipment</h1>
+              <p className="text-muted-foreground">Manage your equipment inventory and assets</p>
+            </div>
             {canCreate && (
               <DialogTrigger asChild>
                 <Button onClick={openDialogForCreate}>
-                  <Plus className="mr-2 h-4 w-4" />
-                  Nouvel équipement
+                  <Plus className="mr-2 h-4 w-4" /> Add Equipment
                 </Button>
               </DialogTrigger>
             )}
           </div>
-        </motion.div>
 
-        {/* Filters */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.1 }}
-        >
-          <Card>
-            <CardContent className="pt-6">
-              <EquipmentFilters
-                filters={filters}
-                onFiltersChange={handleFiltersChange}
-                onClearFilters={handleClearFilters}
-                isLoading={isLoading}
-              />
-            </CardContent>
-          </Card>
-        </motion.div>
+          {/* Stat Cards */}
+          <EquipmentStats stats={equipmentStats} isLoading={isLoading} />
 
-        {/* Equipment Table */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.2 }}
-        >
+          {/* Equipment List Card */}
           <Card>
             <CardHeader>
-              <CardTitle>Liste des équipements</CardTitle>
+              <CardTitle>Equipment List</CardTitle>
+              <CardDescription>A list of all equipment in your system</CardDescription>
+              <div className="flex items-center justify-between pt-4">
+                <div className="flex items-center gap-2">
+                  <Input 
+                    placeholder="Search equipment..." 
+                    className="w-64"
+                    value={filters.searchTerm}
+                    onChange={(e) => setFilters(f => ({...f, searchTerm: e.target.value, pageNumber: 1}))}
+                  />
+                  <Select value={String(filters.pageSize)} onValueChange={(v) => setFilters(f => ({...f, pageSize: Number(v)}))}>
+                    <SelectTrigger className="w-28">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="10">10 rows</SelectItem>
+                      <SelectItem value="20">20 rows</SelectItem>
+                      <SelectItem value="50">50 rows</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Button variant="outline" size="sm"><Printer className="h-4 w-4 mr-2" />Print</Button>
+                  <Button variant="outline" size="sm"><Copy className="h-4 w-4 mr-2" />Copy</Button>
+                  <Button variant="outline" size="sm"><FileSpreadsheet className="h-4 w-4 mr-2" />Excel</Button>
+                  <Button variant="outline" size="sm"><FileText className="h-4 w-4 mr-2" />PDF</Button>
+                </div>
+              </div>
             </CardHeader>
             <CardContent>
               {error ? (
-                <div className="text-center py-12">
-                  <div className="text-red-600 mb-2">
-                    Erreur lors du chargement des équipements
-                  </div>
-                  <p className="text-gray-500 text-sm">
-                    {error.message || 'Une erreur inattendue s\'est produite'}
-                  </p>
-                </div>
+                <div className="text-center py-12 text-red-500">Error loading equipment.</div>
               ) : (
                 <EquipmentTable 
-                  equipment={equipment} 
+                  equipment={equipmentList} 
                   isLoading={isLoading}
                   onEdit={openDialogForEdit}
+                  onDelete={openDeleteDialog}
                 />
               )}
             </CardContent>
           </Card>
-        </motion.div>
+        </div>
 
-        {/* Pagination */}
-        {totalPages > 1 && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.3 }}
-            className="flex justify-center"
-          >
-            <Pagination>
-              <PaginationContent>
-                <PaginationItem>
-                  <PaginationPrevious 
-                    onClick={() => handlePageChange(currentPage - 1)}
-                    className={currentPage <= 1 ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
-                  />
-                </PaginationItem>
-                
-                {[...Array(totalPages)].map((_, i) => {
-                  const page = i + 1;
-                  if (
-                    page === 1 ||
-                    page === totalPages ||
-                    (page >= currentPage - 1 && page <= currentPage + 1)
-                  ) {
-                    return (
-                      <PaginationItem key={page}>
-                        <PaginationLink
-                          onClick={() => handlePageChange(page)}
-                          isActive={page === currentPage}
-                          className="cursor-pointer"
-                        >
-                          {page}
-                        </PaginationLink>
-                      </PaginationItem>
-                    );
-                  } else if (
-                    page === currentPage - 2 ||
-                    page === currentPage + 2
-                  ) {
-                    return (
-                      <PaginationItem key={page}>
-                        <PaginationEllipsis />
-                      </PaginationItem>
-                    );
-                  }
-                  return null;
-                })}
-                
-                <PaginationItem>
-                  <PaginationNext 
-                    onClick={() => handlePageChange(currentPage + 1)}
-                    className={currentPage >= totalPages ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
-                  />
-                </PaginationItem>
-              </PaginationContent>
-            </Pagination>
-          </motion.div>
-        )}
-      </div>
-
-      <EquipmentForm
-        equipment={selectedEquipment}
-        onSubmit={handleFormSubmit}
-        isLoading={createEquipmentMutation.isPending || updateEquipmentMutation.isPending}
+        <EquipmentForm
+          equipment={selectedEquipment}
+          onSubmit={handleFormSubmit}
+          isLoading={createEquipmentMutation.isPending || updateEquipmentMutation.isPending}
+        />
+      </Dialog>
+      
+      <DeleteConfirmationDialog 
+        open={deleteDialogOpen}
+        onOpenChange={setDeleteDialogOpen}
+        onConfirm={handleDeleteConfirm}
+        itemName={selectedEquipment?.nom}
+        itemType="equipment"
+        loading={deleteEquipmentMutation.isPending}
       />
-    </Dialog>
+    </>
   );
 };
 
